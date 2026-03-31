@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Admin Panel | Manage Products</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+    body {
+      background: #f1f5f9;
+      padding: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .card {
+      background: white;
+      border-radius: 28px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+      color: #0f172a;
+    }
+    .login-box {
+      text-align: center;
+      padding: 32px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 14px;
+      margin: 8px 0 16px;
+      border: 1px solid #cbd5e1;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      background: #f8fafc;
+    }
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 40px;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+      margin-top: 8px;
+      font-size: 0.9rem;
+    }
+    button.danger {
+      background: #ef4444;
+    }
+    button.secondary {
+      background: #64748b;
+    }
+    .product-item {
+      background: #f9fafb;
+      border-radius: 20px;
+      padding: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .product-info {
+      flex: 3;
+    }
+    .product-name-admin {
+      font-weight: 700;
+    }
+    .product-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .product-actions button {
+      width: auto;
+      padding: 6px 14px;
+      font-size: 0.75rem;
+    }
+    hr {
+      margin: 20px 0;
+    }
+    .alert {
+      background: #dcfce7;
+      color: #166534;
+      padding: 12px;
+      border-radius: 20px;
+      margin: 12px 0;
+    }
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+  </style>
+</head>
+<body>
+<div class="container" id="app">
+  <div class="card login-box" id="loginPanel">
+    <h2>🔐 Admin Access</h2>
+    <input type="password" id="adminPassword" placeholder="Enter admin password">
+    <button id="loginBtn">Login</button>
+    <div id="loginError" style="color:red; margin-top:12px;"></div>
+  </div>
+
+  <div id="adminPanel" style="display: none;">
+    <div class="card">
+      <h2>➕ Add New Product</h2>
+      <input type="text" id="name" placeholder="Product name *" required>
+      <textarea id="description" rows="2" placeholder="Description *"></textarea>
+      <input type="number" id="price" placeholder="Price (₹) *" required>
+      <input type="url" id="imageUrl" placeholder="Image URL * (e.g., https://...jpg)" required>
+      <select id="category">
+        <option value="Phone">📱 Phone</option>
+        <option value="Accessory">🎧 Accessory</option>
+        <option value="Tablet">📟 Tablet</option>
+      </select>
+      <button id="addProductBtn">Add Product</button>
+      <div id="addMessage"></div>
+    </div>
+
+    <div class="card">
+      <h2>📦 Manage Products</h2>
+      <div id="productListAdmin"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let adminKey = null;
+  let products = [];
+
+  async function callApi(endpoint, method = 'GET', body = null) {
+    const headers = {
+      'Content-Type': 'application/json',
+      'x-admin-key': adminKey
+    };
+    const options = { method, headers };
+    if (body) options.body = JSON.stringify(body);
+
+    const res = await fetch(endpoint, options);
+    if (res.status === 401) {
+      alert('Session expired. Please login again.');
+      logout();
+      return null;
+    }
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Request failed');
+    return data;
+  }
+
+  async function loadProducts() {
+    try {
+      const data = await callApi('/api/products');
+      if (data) {
+        products = data;
+        renderProductList();
+      }
+    } catch (err) {
+      document.getElementById('productListAdmin').innerHTML = `<div class="alert error">Failed to load: ${err.message}</div>`;
+    }
+  }
+
+  function renderProductList() {
+    const container = document.getElementById('productListAdmin');
+    if (!products.length) {
+      container.innerHTML = '<div class="alert">No products yet. Add your first item!</div>';
+      return;
+    }
+    container.innerHTML = products.map(p => `
+      <div class="product-item" data-id="${p._id}">
+        <div class="product-info">
+          <div class="product-name-admin">${escapeHtml(p.name)}</div>
+          <div>₹${p.price} | ${p.category}</div>
+          <small>${p.description.substring(0, 60)}...</small>
+        </div>
+        <div class="product-actions">
+          <button class="secondary" onclick="editProduct('${p._id}')">✏️ Edit</button>
+          <button class="danger" onclick="deleteProduct('${p._id}')">🗑️ Del</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function addProduct() {
+    const name = document.getElementById('name').value.trim();
+    const description = document.getElementById('description').value.trim();
+    const price = parseFloat(document.getElementById('price').value);
+    const imageUrl = document.getElementById('imageUrl').value.trim();
+    const category = document.getElementById('category').value;
+
+    if (!name || !description || isNaN(price) || !imageUrl) {
+      document.getElementById('addMessage').innerHTML = '<div class="alert error">All fields required!</div>';
+      return;
+    }
+
+    try {
+      await callApi('/api/products', 'POST', { name, description, price, imageUrl, category });
+      document.getElementById('addMessage').innerHTML = '<div class="alert">✅ Product added!</div>';
+      document.getElementById('name').value = '';
+      document.getElementById('description').value = '';
+      document.getElementById('price').value = '';
+      document.getElementById('imageUrl').value = '';
+      loadProducts();
+      setTimeout(() => document.getElementById('addMessage').innerHTML = '', 2000);
+    } catch (err) {
+      document.getElementById('addMessage').innerHTML = `<div class="alert error">❌ ${err.message}</div>`;
+    }
+  }
+
+  async function deleteProduct(id) {
+    if (!confirm('Delete this product permanently?')) return;
+    try {
+      await callApi(`/api/products/${id}`, 'DELETE');
+      loadProducts();
+    } catch (err) {
+      alert('Delete failed: ' + err.message);
+    }
+  }
+
+  window.editProduct = async function(id) {
+    const product = products.find(p => p._id === id);
+    if (!product) return;
+    const newName = prompt('Edit product name:', product.name);
+    if (newName === null) return;
+    const newDesc = prompt('Edit description:', product.description);
+    const newPrice = parseFloat(prompt('Edit price (₹):', product.price));
+    const newImage = prompt('Edit image URL:', product.imageUrl);
+    const newCat = prompt('Edit category (Phone/Accessory/Tablet):', product.category);
+    if (!newName || !newDesc || isNaN(newPrice) || !newImage) {
+      alert('Invalid input. Update cancelled.');
+      return;
+    }
+    try {
+      await callApi(`/api/products/${id}`, 'PUT', {
+        name: newName,
+        description: newDesc,
+        price: newPrice,
+        imageUrl: newImage,
+        category: newCat
+      });
+      loadProducts();
+    } catch (err) {
+      alert('Update error: ' + err.message);
+    }
+  };
+
+  function logout() {
+    adminKey = null;
+    document.getElementById('loginPanel').style.display = 'block';
+    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('adminPassword').value = '';
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  document.getElementById('loginBtn').onclick = async () => {
+    const pwd = document.getElementById('adminPassword').value;
+    if (!pwd) return;
+    // simple test by trying to fetch products with this key
+    adminKey = pwd;
+    try {
+      const res = await fetch('/api/products', { headers: { 'x-admin-key': adminKey } });
+      if (res.status === 401) throw new Error('Wrong password');
+      const data = await res.json();
+      products = data;
+      document.getElementById('loginPanel').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'block';
+      renderProductList();
+      document.getElementById('addProductBtn').onclick = addProduct;
+    } catch (err) {
+      document.getElementById('loginError').innerText = '❌ Incorrect admin password';
+      adminKey = null;
+    }
+  };
+
+  // logout if any 401 triggers later
+  window.logout = logout;
+</script>
+</body>
+</html>
