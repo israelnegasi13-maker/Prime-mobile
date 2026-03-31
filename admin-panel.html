@@ -274,7 +274,6 @@
   document.getElementById('loginBtn').onclick = async () => {
     const pwd = document.getElementById('adminPassword').value;
     if (!pwd) return;
-    // simple test by trying to fetch products with this key
     adminKey = pwd;
     try {
       const res = await fetch('/api/products', { headers: { 'x-admin-key': adminKey } });
@@ -291,7 +290,6 @@
     }
   };
 
-  // logout if any 401 triggers later
   window.logout = logout;
 </script>
 </body>
