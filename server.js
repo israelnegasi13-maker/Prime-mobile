@@ -103,15 +103,13 @@ app.delete('/api/products/:id', adminAuth, async (req, res) => {
   }
 });
 
-// Serve main.html at root
+// Serve frontend files
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'main.html'));
 });
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin-panel.html'));
 });
-
-// Optional: serve static files (if you add CSS/JS files later)
 app.use(express.static(__dirname));
 
 // Start server
