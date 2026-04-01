@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="am">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <title>Mobile Hub | Best Phones & Accessories</title>
+  <title>ፕራይም ሞባይል | ምርጥ ስልኮች እና መለዋወጫዎች</title>
   <style>
     * {
       margin: 0;
@@ -28,6 +28,7 @@
       margin-bottom: 24px;
       color: white;
       box-shadow: 0 8px 20px rgba(59,130,246,0.2);
+      position: relative;
     }
     .hero h1 {
       font-size: 1.8rem;
@@ -39,6 +40,26 @@
     .hero p {
       opacity: 0.9;
       font-size: 0.9rem;
+      margin-top: 8px;
+    }
+    .open-status {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .open-status.open {
+      background: #10b981;
+      color: white;
+    }
+    .open-status.closed {
+      background: #ef4444;
+      color: white;
     }
     .filter-bar {
       background: white;
@@ -187,8 +208,7 @@
       color: #64748b;
       font-size: 0.75rem;
     }
-
-    /* Lightbox / Modal Gallery */
+    /* Lightbox */
     .lightbox {
       display: none;
       position: fixed;
@@ -263,21 +283,22 @@
 <body>
 <div class="container">
   <div class="hero">
-    <h1>📱 Mobile Hub</h1>
-    <p>Latest smartphones & accessories — order via WhatsApp</p>
+    <h1>📱 ፕራይም ሞባይል</h1>
+    <p>የሞባይል ስልኮች እና መለዋወጫዎች — በዋትስአፕ ይዘዙ</p>
+    <div id="openStatus" class="open-status">...</div>
   </div>
 
   <div class="filter-bar">
-    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search products..." autocomplete="off">
+    <input type="text" id="searchInput" class="search-input" placeholder="🔍 ምርቶችን ፈልግ..." autocomplete="off">
     <div class="category-chips" id="categoryFilters">
-      <div class="chip active" data-category="All">All</div>
+      <div class="chip active" data-category="All">ሁሉም</div>
     </div>
   </div>
 
   <div id="productList" class="product-grid">
-    <div class="loader">Loading products...</div>
+    <div class="loader">ምርቶች በመጫን ላይ...</div>
   </div>
-  <footer>© Mobile Hub — contact us for best deals</footer>
+  <footer>© ፕራይም ሞባይል — ለምርጥ ዋጋዎች ያግኙን</footer>
 </div>
 
 <!-- Lightbox -->
@@ -291,19 +312,43 @@
 
 <script>
   let allProducts = [];
-  let shopPhone = '919876543210';
+  let shopPhone = '0962577855';
+  let shopName = 'Prime Mobile';
+  let isOpen = true;
   let currentCategory = 'All';
   let currentSearch = '';
   let lightboxImages = [];
   let lightboxIndex = 0;
 
+  // Category name translation
+  const categoryTranslation = {
+    'All': 'ሁሉም',
+    'Phone': 'ስልክ',
+    'Accessory': 'መለዋወጫ',
+    'Tablet': 'ታብሌት'
+  };
+
   async function fetchSettings() {
     try {
       const res = await fetch('/api/settings');
       const data = await res.json();
-      if (data.phone) shopPhone = data.phone;
+      shopPhone = data.phone || '0962577855';
+      shopName = data.shopName || 'Prime Mobile';
+      isOpen = data.isOpen !== undefined ? data.isOpen : true;
+      updateOpenStatus();
     } catch (err) {
-      console.warn('Could not load settings, using default phone');
+      console.warn('Could not load settings');
+    }
+  }
+
+  function updateOpenStatus() {
+    const statusDiv = document.getElementById('openStatus');
+    if (isOpen) {
+      statusDiv.innerText = 'ክፍት ነን';
+      statusDiv.className = 'open-status open';
+    } else {
+      statusDiv.innerText = 'ዘግተናል';
+      statusDiv.className = 'open-status closed';
     }
   }
 
@@ -313,7 +358,7 @@
       const categories = await res.json();
       const container = document.getElementById('categoryFilters');
       container.innerHTML = categories.map(cat => `
-        <div class="chip ${cat === 'All' ? 'active' : ''}" data-category="${cat}">${cat}</div>
+        <div class="chip ${cat === 'All' ? 'active' : ''}" data-category="${cat}">${categoryTranslation[cat] || cat}</div>
       `).join('');
       document.querySelectorAll('.chip').forEach(chip => {
         chip.addEventListener('click', () => {
@@ -336,7 +381,7 @@
       allProducts = await res.json();
       filterAndRender();
     } catch (err) {
-      container.innerHTML = '<div class="error-msg">⚠️ Failed to load products. Please refresh.</div>';
+      container.innerHTML = '<div class="error-msg">⚠️ ምርቶችን መጫን አልተቻለም። እባክዎ ይጠብቁ።</div>';
       console.error(err);
     }
   }
@@ -355,29 +400,29 @@
       );
     }
     if (filtered.length === 0) {
-      container.innerHTML = '<div class="no-results">✨ No products match your filters. Try something else!</div>';
+      container.innerHTML = '<div class="no-results">✨ ምርቶች አልተገኙም። ሌላ ነገር ይሞክሩ!</div>';
       return;
     }
     container.innerHTML = filtered.map(product => {
       const images = product.images && product.images.length ? product.images : (product.imageUrl ? [product.imageUrl] : []);
       const firstImage = images[0] || 'https://placehold.co/600x400?text=No+Image';
+      const categoryDisplay = categoryTranslation[product.category] || product.category;
       return `
         <div class="card">
           <img class="card-img" src="${escapeHtml(firstImage)}" alt="${escapeHtml(product.name)}" data-images='${JSON.stringify(images)}' data-name="${escapeHtml(product.name)}">
           <div class="card-content">
-            <span class="category-badge">${escapeHtml(product.category)}</span>
+            <span class="category-badge">${escapeHtml(categoryDisplay)}</span>
             <div class="product-name">${escapeHtml(product.name)}</div>
-            <div class="product-price">₹${product.price.toLocaleString()}</div>
+            <div class="product-price">${product.price.toLocaleString()} ብር</div>
             <div class="product-desc">${escapeHtml(product.description)}</div>
-            <a href="https://wa.me/${shopPhone}?text=Hi! I'm interested in ${encodeURIComponent(product.name)} (₹${product.price})" target="_blank" class="whatsapp-btn">
-              💬 Buy on WhatsApp
+            <a href="https://wa.me/${shopPhone}?text=ሰላም! ስለ ${encodeURIComponent(product.name)} (${product.price} ብር) ማዘዝ እፈልጋለሁ" target="_blank" class="whatsapp-btn">
+              💬 በዋትስአፕ ይዘዙ
             </a>
           </div>
         </div>
       `;
     }).join('');
 
-    // Attach click handlers for images
     document.querySelectorAll('.card-img').forEach(img => {
       img.addEventListener('click', (e) => {
         const images = JSON.parse(img.dataset.images);
@@ -408,8 +453,7 @@
   function nextImage() {
     if (lightboxIndex + 1 < lightboxImages.length) {
       lightboxIndex++;
-      const imgEl = document.getElementById('lightboxImg');
-      imgEl.src = lightboxImages[lightboxIndex];
+      document.getElementById('lightboxImg').src = lightboxImages[lightboxIndex];
       document.getElementById('lightboxCounter').innerText = `${lightboxIndex+1} / ${lightboxImages.length}`;
     }
   }
@@ -417,8 +461,7 @@
   function prevImage() {
     if (lightboxIndex - 1 >= 0) {
       lightboxIndex--;
-      const imgEl = document.getElementById('lightboxImg');
-      imgEl.src = lightboxImages[lightboxIndex];
+      document.getElementById('lightboxImg').src = lightboxImages[lightboxIndex];
       document.getElementById('lightboxCounter').innerText = `${lightboxIndex+1} / ${lightboxImages.length}`;
     }
   }
@@ -438,14 +481,12 @@
     filterAndRender();
   });
 
-  // Lightbox event listeners
   document.getElementById('lightbox').addEventListener('click', (e) => {
     if (e.target === document.getElementById('lightbox') || e.target.classList.contains('close')) closeLightbox();
   });
   document.querySelector('.prev').addEventListener('click', prevImage);
   document.querySelector('.next').addEventListener('click', nextImage);
 
-  // Swipe support for mobile
   let touchStartX = 0;
   document.getElementById('lightbox').addEventListener('touchstart', (e) => {
     touchStartX = e.touches[0].clientX;
