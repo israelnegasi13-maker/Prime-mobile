@@ -61,6 +61,50 @@
       background: #ef4444;
       color: white;
     }
+    .shop-info-card {
+      background: white;
+      border-radius: 28px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .shop-info-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1e40af;
+    }
+    .shop-detail {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #334155;
+      font-size: 0.95rem;
+    }
+    .shop-detail a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+    .shop-detail a:active {
+      color: #1e40af;
+    }
+    .call-now-btn {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 40px;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 8px;
+    }
     .filter-bar {
       background: white;
       border-radius: 28px;
@@ -162,12 +206,12 @@
       color: #1e293b;
       margin-bottom: 10px;
     }
-    .whatsapp-btn {
+    .call-btn {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      background: #25D366;
+      background: #10b981;
       color: white;
       border: none;
       padding: 14px 18px;
@@ -180,8 +224,8 @@
       transition: background 0.2s;
       touch-action: manipulation;
     }
-    .whatsapp-btn:active {
-      background: #128C7E;
+    .call-btn:active {
+      background: #059669;
       transform: scale(0.98);
     }
     .loader {
@@ -284,8 +328,25 @@
 <div class="container">
   <div class="hero">
     <h1>📱 ፕራይም ሞባይል</h1>
-    <p>የሞባይል ስልኮች እና መለዋወጫዎች — በዋትስአፕ ይዘዙ</p>
+    <p>የሞባይል ስልኮች እና መለዋወጫዎች — ይደውሉልን</p>
     <div id="openStatus" class="open-status">...</div>
+  </div>
+
+  <!-- Shop Information Card -->
+  <div class="shop-info-card" id="shopInfoCard">
+    <div class="shop-info-header">
+      <span>🏪</span> <span>ስለ ሱቃችን</span>
+    </div>
+    <div class="shop-detail">
+      <span>📞</span> <span id="shopPhoneDisplay">0962577855</span>
+    </div>
+    <div class="shop-detail">
+      <span>⏰</span> <span id="shopHoursDisplay">ከሰአት 9 ማለዳ - 9 ማታ</span>
+    </div>
+    <div class="shop-detail">
+      <span>📍</span> <span>አዲስ አበባ፣ ኢትዮጵያ</span>
+    </div>
+    <a href="tel:0962577855" class="call-now-btn" id="callNowBtn">📞 አሁን ይደውሉ</a>
   </div>
 
   <div class="filter-bar">
@@ -313,14 +374,12 @@
 <script>
   let allProducts = [];
   let shopPhone = '0962577855';
-  let shopName = 'Prime Mobile';
   let isOpen = true;
   let currentCategory = 'All';
   let currentSearch = '';
   let lightboxImages = [];
   let lightboxIndex = 0;
 
-  // Category name translation
   const categoryTranslation = {
     'All': 'ሁሉም',
     'Phone': 'ስልክ',
@@ -333,9 +392,9 @@
       const res = await fetch('/api/settings');
       const data = await res.json();
       shopPhone = data.phone || '0962577855';
-      shopName = data.shopName || 'Prime Mobile';
       isOpen = data.isOpen !== undefined ? data.isOpen : true;
       updateOpenStatus();
+      updateShopInfo();
     } catch (err) {
       console.warn('Could not load settings');
     }
@@ -346,10 +405,18 @@
     if (isOpen) {
       statusDiv.innerText = 'ክፍት ነን';
       statusDiv.className = 'open-status open';
+      document.getElementById('shopHoursDisplay').innerHTML = 'ከሰአት 9 ማለዳ - 9 ማታ (ክፍት)';
     } else {
       statusDiv.innerText = 'ዘግተናል';
       statusDiv.className = 'open-status closed';
+      document.getElementById('shopHoursDisplay').innerHTML = 'አሁን ዘግተናል፣ እንደገና ይጎብኙን';
     }
+  }
+
+  function updateShopInfo() {
+    document.getElementById('shopPhoneDisplay').innerText = shopPhone;
+    const callBtn = document.getElementById('callNowBtn');
+    callBtn.href = `tel:${shopPhone}`;
   }
 
   async function fetchCategories() {
@@ -415,8 +482,8 @@
             <div class="product-name">${escapeHtml(product.name)}</div>
             <div class="product-price">${product.price.toLocaleString()} ብር</div>
             <div class="product-desc">${escapeHtml(product.description)}</div>
-            <a href="https://wa.me/${shopPhone}?text=ሰላም! ስለ ${encodeURIComponent(product.name)} (${product.price} ብር) ማዘዝ እፈልጋለሁ" target="_blank" class="whatsapp-btn">
-              💬 በዋትስአፕ ይዘዙ
+            <a href="tel:${shopPhone}" class="call-btn">
+              📞 ይደውሉልን
             </a>
           </div>
         </div>
