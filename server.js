@@ -9,7 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASS = process.env.ADMIN_PASS || 'mysecret123';
 
-const MONGODB_URI = process.env.MONGODB_URI || 
+const MONGODB_URI = process.env.MONGODB_URI ||
   'mongodb+srv://prime:mikejava@cluster0.pzdvmr9.mongodb.net/shopdb?retryWrites=true&w=majority';
 
 app.use(express.json());
@@ -19,19 +19,37 @@ mongoose.connect(MONGODB_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// Product Schema with images array
+// Product Schema
 const productSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   description: { type: String, required: true, trim: true },
   price: { type: Number, required: true, min: 0 },
-  imageUrl: { type: String, trim: true }, // kept for backward compatibility
-  images: { type: [String], default: [] }, // new array for multiple images
+  imageUrl: { type: String, trim: true },
+  images: { type: [String], default: [] },
   category: { type: String, default: 'Phone', enum: ['Phone', 'Accessory', 'Tablet'] },
   createdAt: { type: Date, default: Date.now }
 });
-
 const Product = mongoose.model('Product', productSchema);
 
+// Settings Schema (singleton)
+const settingsSchema = new mongoose.Schema({
+  isOpen: { type: Boolean, default: true },
+  phone: { type: String, default: '0962577855' },
+  shopName: { type: String, default: 'Prime Mobile' }
+});
+const Settings = mongoose.model('Settings', settingsSchema);
+
+// Initialize default settings if not exists
+async function initSettings() {
+  const count = await Settings.countDocuments();
+  if (count === 0) {
+    await Settings.create({ isOpen: true, phone: '0962577855', shopName: 'Prime Mobile' });
+    console.log('✅ Default settings created');
+  }
+}
+initSettings();
+
+// Admin Auth Middleware
 const adminAuth = (req, res, next) => {
   const adminKey = req.headers['x-admin-key'];
   if (!adminKey || adminKey !== ADMIN_PASS) {
@@ -54,7 +72,7 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-// Get distinct categories
+// Get categories (public)
 app.get('/api/categories', async (req, res) => {
   try {
     const categories = await Product.distinct('category');
@@ -64,29 +82,47 @@ app.get('/api/categories', async (req, res) => {
   }
 });
 
-// Get shop settings
-app.get('/api/settings', (req, res) => {
-  res.json({ 
-    phone: process.env.SHOP_PHONE || '919876543210',
-    shopName: 'Mobile Hub'
-  });
+// Get settings (public)
+app.get('/api/settings', async (req, res) => {
+  try {
+    const settings = await Settings.findOne();
+    res.json(settings || { isOpen: true, phone: '0962577855', shopName: 'Prime Mobile' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Create product (admin)
+// Update settings (admin only)
+app.put('/api/settings', adminAuth, async (req, res) => {
+  try {
+    const { isOpen, phone, shopName } = req.body;
+    let settings = await Settings.findOne();
+    if (!settings) {
+      settings = new Settings();
+    }
+    if (isOpen !== undefined) settings.isOpen = isOpen;
+    if (phone !== undefined) settings.phone = phone;
+    if (shopName !== undefined) settings.shopName = shopName;
+    await settings.save();
+    res.json(settings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Product CRUD (admin only)
 app.post('/api/products', adminAuth, async (req, res) => {
   try {
-    const { name, description, price, imageUrl, images, category } = req.body;
+    const { name, description, price, images, category } = req.body;
     if (!name || !description || !price) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
-    // If images array is provided, use it; otherwise fall back to single imageUrl
-    const product = new Product({ 
-      name, 
-      description, 
-      price, 
-      imageUrl: imageUrl || (images && images[0]) || '',
-      images: images || (imageUrl ? [imageUrl] : []),
-      category 
+    const product = new Product({
+      name,
+      description,
+      price,
+      images: images || [],
+      category
     });
     await product.save();
     res.status(201).json(product);
@@ -95,19 +131,15 @@ app.post('/api/products', adminAuth, async (req, res) => {
   }
 });
 
-// Update product (admin)
 app.put('/api/products/:id', adminAuth, async (req, res) => {
   try {
-    const { name, description, price, imageUrl, images, category } = req.body;
+    const { name, description, price, images, category } = req.body;
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ error: 'Invalid product ID' });
     }
-    const updateData = { name, description, price, category };
-    if (imageUrl !== undefined) updateData.imageUrl = imageUrl;
-    if (images !== undefined) updateData.images = images;
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
-      updateData,
+      { name, description, price, images, category },
       { new: true, runValidators: true }
     );
     if (!updatedProduct) return res.status(404).json({ error: 'Product not found' });
@@ -117,7 +149,6 @@ app.put('/api/products/:id', adminAuth, async (req, res) => {
   }
 });
 
-// Delete product (admin)
 app.delete('/api/products/:id', adminAuth, async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
