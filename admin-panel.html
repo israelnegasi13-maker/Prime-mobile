@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="am">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <title>Admin Panel | Manage Products</title>
+  <title>አስተዳዳሪ | ምርቶችን ያስተዳድሩ</title>
   <style>
     * {
       margin: 0;
@@ -72,6 +72,9 @@
     }
     button.secondary {
       background: #64748b;
+    }
+    button.success {
+      background: #10b981;
     }
     .images-list {
       display: flex;
@@ -213,49 +216,81 @@
       font-size: 0.9rem;
       background: #f8fafc;
     }
+    .toggle-switch {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 16px 0;
+    }
+    .toggle-switch input {
+      width: auto;
+      margin: 0;
+    }
+    .phone-input {
+      margin: 8px 0;
+    }
   </style>
 </head>
 <body>
 <div class="container" id="app">
   <div class="card login-box" id="loginPanel">
-    <h2>🔐 Admin Access</h2>
-    <input type="password" id="adminPassword" placeholder="Enter admin password" autocomplete="off">
-    <button id="loginBtn">Login</button>
+    <h2>🔐 የአስተዳዳሪ መግቢያ</h2>
+    <input type="password" id="adminPassword" placeholder="የይለፍ ቃል ያስገቡ" autocomplete="off">
+    <button id="loginBtn">ግባ</button>
     <div id="loginError" style="color:red; margin-top:12px;"></div>
   </div>
 
   <div id="adminPanel" style="display: none;">
     <div class="admin-header">
-      <h2>📦 Product Manager</h2>
-      <button class="logout-btn" id="logoutBtn">🚪 Logout</button>
+      <h2>📦 ምርት አስተዳዳሪ</h2>
+      <button class="logout-btn" id="logoutBtn">🚪 ውጣ</button>
+    </div>
+
+    <!-- Settings Card -->
+    <div class="card">
+      <h2>⚙️ የሱቅ ቅንብሮች</h2>
+      <div class="toggle-switch">
+        <label>የሱቅ ሁኔታ:</label>
+        <label>
+          <input type="radio" name="openStatus" value="true"> ክፍት ነን
+        </label>
+        <label>
+          <input type="radio" name="openStatus" value="false"> ዘግተናል
+        </label>
+      </div>
+      <div class="phone-input">
+        <input type="tel" id="shopPhone" placeholder="የዋትስአፕ ስልክ ቁጥር (ከአገር ኮድ ጋር)" value="0962577855">
+      </div>
+      <button id="saveSettingsBtn">ቅንብሮችን አስቀምጥ</button>
+      <div id="settingsMessage"></div>
     </div>
 
     <div class="card">
-      <h2>➕ Add New Product</h2>
-      <input type="text" id="name" placeholder="Product name *" required>
-      <textarea id="description" rows="2" placeholder="Description *" required></textarea>
-      <input type="number" id="price" placeholder="Price (₹) *" required>
+      <h2>➕ አዲስ ምርት ጨምር</h2>
+      <input type="text" id="name" placeholder="የምርት ስም *" required>
+      <textarea id="description" rows="2" placeholder="መግለጫ *" required></textarea>
+      <input type="number" id="price" placeholder="ዋጋ (ብር) *" required>
       <div>
-        <label>Images (multiple URLs) *</label>
+        <label>ምስሎች (ብዙ URL) *</label>
         <div id="imagesContainer" class="images-list"></div>
-        <button type="button" id="addImageBtn" class="add-image-btn">+ Add Image URL</button>
+        <button type="button" id="addImageBtn" class="add-image-btn">+ የምስል URL ጨምር</button>
       </div>
       <select id="category">
-        <option value="Phone">📱 Phone</option>
-        <option value="Accessory">🎧 Accessory</option>
-        <option value="Tablet">📟 Tablet</option>
+        <option value="Phone">📱 ስልክ</option>
+        <option value="Accessory">🎧 መለዋወጫ</option>
+        <option value="Tablet">📟 ታብሌት</option>
       </select>
-      <button id="addProductBtn">Add Product</button>
+      <button id="addProductBtn">ምርት ጨምር</button>
       <div id="addMessage"></div>
     </div>
 
     <div class="card">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
-        <h2 style="margin-bottom: 0;">📋 Manage Products</h2>
-        <div class="stats" id="productCount">0 products</div>
+        <h2 style="margin-bottom: 0;">📋 ምርቶችን ያስተዳድሩ</h2>
+        <div class="stats" id="productCount">0 ምርቶች</div>
       </div>
       <div class="search-box">
-        <input type="text" id="adminSearch" class="admin-search-input" placeholder="🔍 Search products by name or description...">
+        <input type="text" id="adminSearch" class="admin-search-input" placeholder="🔍 በስም ወይም መግለጫ ፈልግ...">
       </div>
       <div id="productListAdmin"></div>
     </div>
@@ -266,19 +301,16 @@
   let adminKey = null;
   let allProducts = [];
   let searchTerm = '';
-  let currentImages = []; // For add form
+  let currentImages = [];
+  let settings = { isOpen: true, phone: '0962577855' };
 
   async function callApi(endpoint, method = 'GET', body = null) {
-    const headers = {
-      'Content-Type': 'application/json',
-      'x-admin-key': adminKey
-    };
+    const headers = { 'Content-Type': 'application/json', 'x-admin-key': adminKey };
     const options = { method, headers };
     if (body) options.body = JSON.stringify(body);
-
     const res = await fetch(endpoint, options);
     if (res.status === 401) {
-      alert('Session expired. Please login again.');
+      alert('ክፍለ ጊዜዎ አልቋል። እባክዎ እንደገና ይግቡ።');
       logout();
       return null;
     }
@@ -287,16 +319,41 @@
     return data;
   }
 
+  async function loadSettings() {
+    try {
+      const res = await fetch('/api/settings');
+      const data = await res.json();
+      settings = data;
+      document.querySelector(`input[name="openStatus"][value="${settings.isOpen}"]`).checked = true;
+      document.getElementById('shopPhone').value = settings.phone || '0962577855';
+    } catch (err) {
+      console.error('Failed to load settings', err);
+    }
+  }
+
+  async function saveSettings() {
+    const isOpen = document.querySelector('input[name="openStatus"]:checked').value === 'true';
+    const phone = document.getElementById('shopPhone').value.trim();
+    try {
+      await callApi('/api/settings', 'PUT', { isOpen, phone });
+      document.getElementById('settingsMessage').innerHTML = '<div class="alert">✅ ቅንብሮች ተቀመጡ!</div>';
+      setTimeout(() => document.getElementById('settingsMessage').innerHTML = '', 2000);
+      settings = { isOpen, phone };
+    } catch (err) {
+      document.getElementById('settingsMessage').innerHTML = `<div class="alert error">❌ ${err.message}</div>`;
+    }
+  }
+
   async function loadProducts() {
     try {
       const data = await callApi('/api/products');
       if (data) {
         allProducts = data;
         renderProductList();
-        document.getElementById('productCount').innerText = `${allProducts.length} product${allProducts.length !== 1 ? 's' : ''}`;
+        document.getElementById('productCount').innerText = `${allProducts.length} ምርት${allProducts.length !== 1 ? 'ች' : ''}`;
       }
     } catch (err) {
-      document.getElementById('productListAdmin').innerHTML = `<div class="alert error">Failed to load: ${err.message}</div>`;
+      document.getElementById('productListAdmin').innerHTML = `<div class="alert error">መጫን አልተቻለም: ${err.message}</div>`;
     }
   }
 
@@ -312,7 +369,7 @@
       );
     }
     if (!filtered.length) {
-      container.innerHTML = '<div class="alert">No products found.</div>';
+      container.innerHTML = '<div class="alert">ምንም ምርት አልተገኘም።</div>';
       return;
     }
     container.innerHTML = filtered.map(p => {
@@ -322,12 +379,12 @@
           <img class="product-img-thumb" src="${escapeHtml(thumb)}" onerror="this.src='https://placehold.co/70x70?text=No+Image'" alt="thumbnail">
           <div class="product-info">
             <div class="product-name-admin">${escapeHtml(p.name)}</div>
-            <div>₹${p.price.toLocaleString()} | ${escapeHtml(p.category)}</div>
+            <div>${p.price.toLocaleString()} ብር | ${escapeHtml(p.category)}</div>
             <small>${escapeHtml(p.description.substring(0, 60))}${p.description.length > 60 ? '...' : ''}</small>
           </div>
           <div class="product-actions">
-            <button class="secondary" onclick="editProduct('${p._id}')">✏️ Edit</button>
-            <button class="danger" onclick="deleteProduct('${p._id}')">🗑️ Del</button>
+            <button class="secondary" onclick="editProduct('${p._id}')">✏️ አርትዕ</button>
+            <button class="danger" onclick="deleteProduct('${p._id}')">🗑️ ሰርዝ</button>
           </div>
         </div>
       `;
@@ -353,12 +410,12 @@
   }
 
   document.getElementById('addImageBtn').onclick = () => {
-    const newUrl = prompt('Enter image URL (must start with http):');
+    const newUrl = prompt('የምስል URL ያስገቡ (http:// ወይም https:// መጀመር አለበት):');
     if (newUrl && (newUrl.startsWith('http://') || newUrl.startsWith('https://'))) {
       currentImages.push(newUrl);
       renderImagesInput(currentImages);
     } else {
-      alert('Please enter a valid URL starting with http:// or https://');
+      alert('እባክዎ ትክክለኛ URL ያስገቡ።');
     }
   };
 
@@ -369,18 +426,17 @@
     const category = document.getElementById('category').value;
 
     if (!name || !description || isNaN(price)) {
-      document.getElementById('addMessage').innerHTML = '<div class="alert error">Name, description, and price are required!</div>';
+      document.getElementById('addMessage').innerHTML = '<div class="alert error">ስም፣ መግለጫ እና ዋጋ መሙላት አለባቸው!</div>';
       return;
     }
     if (currentImages.length === 0) {
-      document.getElementById('addMessage').innerHTML = '<div class="alert error">At least one image URL is required!</div>';
+      document.getElementById('addMessage').innerHTML = '<div class="alert error">ቢያንስ አንድ የምስል URL ያስፈልጋል!</div>';
       return;
     }
 
     try {
       await callApi('/api/products', 'POST', { name, description, price, images: currentImages, category });
-      document.getElementById('addMessage').innerHTML = '<div class="alert">✅ Product added!</div>';
-      // Reset form
+      document.getElementById('addMessage').innerHTML = '<div class="alert">✅ ምርት ተጨምሯል!</div>';
       document.getElementById('name').value = '';
       document.getElementById('description').value = '';
       document.getElementById('price').value = '';
@@ -394,37 +450,37 @@
   }
 
   async function deleteProduct(id) {
-    if (!confirm('Delete this product permanently?')) return;
+    if (!confirm('ይህን ምርት ሙሉ በሙሉ መሰረዝ ይፈልጋሉ?')) return;
     try {
       await callApi(`/api/products/${id}`, 'DELETE');
       loadProducts();
     } catch (err) {
-      alert('Delete failed: ' + err.message);
+      alert('መሰረዝ አልተሳካም: ' + err.message);
     }
   }
 
   window.editProduct = async function(id) {
     const product = allProducts.find(p => p._id === id);
     if (!product) return;
-    const newName = prompt('Edit product name:', product.name);
+    const newName = prompt('የምርት ስም አርትዕ:', product.name);
     if (newName === null) return;
-    const newDesc = prompt('Edit description:', product.description);
-    const newPrice = parseFloat(prompt('Edit price (₹):', product.price));
+    const newDesc = prompt('መግለጫ አርትዕ:', product.description);
+    const newPrice = parseFloat(prompt('ዋጋ አርትዕ (ብር):', product.price));
     let newImages = product.images && product.images.length ? [...product.images] : (product.imageUrl ? [product.imageUrl] : []);
-    const editImages = confirm('Edit images? Click OK to modify image URLs, Cancel to keep current.');
+    const editImages = confirm('ምስሎችን ማርትዕ ይፈልጋሉ?');
     if (editImages) {
-      let imagesInput = prompt('Enter image URLs separated by commas:', newImages.join(', '));
+      let imagesInput = prompt('የምስል URLዎችን በኮማ ይለዩ:', newImages.join(', '));
       if (imagesInput !== null) {
         newImages = imagesInput.split(',').map(u => u.trim()).filter(u => u.startsWith('http'));
         if (newImages.length === 0) {
-          alert('No valid images provided. Keeping original.');
+          alert('ልክ ያልሆኑ URLዎች። የቀደሙት ቀጥለዋል።');
           newImages = product.images && product.images.length ? [...product.images] : (product.imageUrl ? [product.imageUrl] : []);
         }
       }
     }
-    const newCat = prompt('Edit category (Phone/Accessory/Tablet):', product.category);
+    const newCat = prompt('ምድብ አርትዕ (Phone/Accessory/Tablet):', product.category);
     if (!newName || !newDesc || isNaN(newPrice)) {
-      alert('Invalid input. Update cancelled.');
+      alert('ልክ ያልሆነ ግቤት። ማርትዕ ተሰርዟል።');
       return;
     }
     try {
@@ -437,7 +493,7 @@
       });
       loadProducts();
     } catch (err) {
-      alert('Update error: ' + err.message);
+      alert('ማዘመን አልተሳካም: ' + err.message);
     }
   };
 
@@ -476,11 +532,13 @@
       document.getElementById('loginPanel').style.display = 'none';
       document.getElementById('adminPanel').style.display = 'block';
       renderProductList();
-      document.getElementById('productCount').innerText = `${allProducts.length} product${allProducts.length !== 1 ? 's' : ''}`;
+      document.getElementById('productCount').innerText = `${allProducts.length} ምርት${allProducts.length !== 1 ? 'ች' : ''}`;
       document.getElementById('addProductBtn').onclick = addProduct;
       document.getElementById('logoutBtn').onclick = logout;
+      document.getElementById('saveSettingsBtn').onclick = saveSettings;
+      await loadSettings();
     } catch (err) {
-      document.getElementById('loginError').innerText = '❌ Incorrect admin password';
+      document.getElementById('loginError').innerText = '❌ የይለፍ ቃል ትክክል አይደለም';
       adminKey = null;
     }
   };
