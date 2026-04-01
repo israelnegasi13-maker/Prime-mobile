@@ -31,11 +31,14 @@ const productSchema = new mongoose.Schema({
 });
 const Product = mongoose.model('Product', productSchema);
 
-// Settings Schema (singleton)
+// Settings Schema (includes promo banner)
 const settingsSchema = new mongoose.Schema({
   isOpen: { type: Boolean, default: true },
   phone: { type: String, default: '0962577855' },
-  shopName: { type: String, default: 'Prime Mobile' }
+  shopName: { type: String, default: 'Prime Mobile' },
+  promoEnabled: { type: Boolean, default: true },
+  promoText: { type: String, default: 'ልዩ ቅናሽ! ከ 3000 ብር በላይ ግዢ ➕ ነጻ ማጓጓዝ' },
+  promoSubtext: { type: String, default: 'ለጊዜው ብቻ' }
 });
 const Settings = mongoose.model('Settings', settingsSchema);
 
@@ -43,7 +46,14 @@ const Settings = mongoose.model('Settings', settingsSchema);
 async function initSettings() {
   const count = await Settings.countDocuments();
   if (count === 0) {
-    await Settings.create({ isOpen: true, phone: '0962577855', shopName: 'Prime Mobile' });
+    await Settings.create({
+      isOpen: true,
+      phone: '0962577855',
+      shopName: 'Prime Mobile',
+      promoEnabled: true,
+      promoText: 'ልዩ ቅናሽ! ከ 3000 ብር በላይ ግዢ ➕ ነጻ ማጓጓዝ',
+      promoSubtext: 'ለጊዜው ብቻ'
+    });
     console.log('✅ Default settings created');
   }
 }
@@ -86,7 +96,14 @@ app.get('/api/categories', async (req, res) => {
 app.get('/api/settings', async (req, res) => {
   try {
     const settings = await Settings.findOne();
-    res.json(settings || { isOpen: true, phone: '0962577855', shopName: 'Prime Mobile' });
+    res.json(settings || {
+      isOpen: true,
+      phone: '0962577855',
+      shopName: 'Prime Mobile',
+      promoEnabled: true,
+      promoText: 'ልዩ ቅናሽ! ከ 3000 ብር በላይ ግዢ ➕ ነጻ ማጓጓዝ',
+      promoSubtext: 'ለጊዜው ብቻ'
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -95,7 +112,7 @@ app.get('/api/settings', async (req, res) => {
 // Update settings (admin only)
 app.put('/api/settings', adminAuth, async (req, res) => {
   try {
-    const { isOpen, phone, shopName } = req.body;
+    const { isOpen, phone, shopName, promoEnabled, promoText, promoSubtext } = req.body;
     let settings = await Settings.findOne();
     if (!settings) {
       settings = new Settings();
@@ -103,6 +120,9 @@ app.put('/api/settings', adminAuth, async (req, res) => {
     if (isOpen !== undefined) settings.isOpen = isOpen;
     if (phone !== undefined) settings.phone = phone;
     if (shopName !== undefined) settings.shopName = shopName;
+    if (promoEnabled !== undefined) settings.promoEnabled = promoEnabled;
+    if (promoText !== undefined) settings.promoText = promoText;
+    if (promoSubtext !== undefined) settings.promoSubtext = promoSubtext;
     await settings.save();
     res.json(settings);
   } catch (err) {
