@@ -229,6 +229,15 @@
     .phone-input {
       margin: 8px 0;
     }
+    .promo-inputs {
+      margin-top: 20px;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 16px;
+    }
+    .promo-inputs h3 {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -261,6 +270,23 @@
       <div class="phone-input">
         <input type="tel" id="shopPhone" placeholder="የዋትስአፕ ስልክ ቁጥር (ከአገር ኮድ ጋር)" value="0962577855">
       </div>
+
+      <!-- Promo Banner Settings -->
+      <div class="promo-inputs">
+        <h3>🎯 የማስተዋወቂያ ባነር ቅንብሮች</h3>
+        <div class="toggle-switch">
+          <label>ማስተዋወቂያ አሳይ:</label>
+          <label>
+            <input type="radio" name="promoEnabled" value="true"> አንቃ
+          </label>
+          <label>
+            <input type="radio" name="promoEnabled" value="false"> አጥፋ
+          </label>
+        </div>
+        <input type="text" id="promoText" placeholder="ዋና ጽሑፍ" value="ልዩ ቅናሽ! ከ 3000 ብር በላይ ግዢ ➕ ነጻ ማጓጓዝ">
+        <input type="text" id="promoSubtext" placeholder="ተጨማሪ ጽሑፍ (እንደ 'ለጊዜው ብቻ')" value="ለጊዜው ብቻ">
+      </div>
+
       <button id="saveSettingsBtn">ቅንብሮችን አስቀምጥ</button>
       <div id="settingsMessage"></div>
     </div>
@@ -302,7 +328,7 @@
   let allProducts = [];
   let searchTerm = '';
   let currentImages = [];
-  let settings = { isOpen: true, phone: '0962577855' };
+  let settings = { isOpen: true, phone: '0962577855', promoEnabled: true, promoText: '', promoSubtext: '' };
 
   async function callApi(endpoint, method = 'GET', body = null) {
     const headers = { 'Content-Type': 'application/json', 'x-admin-key': adminKey };
@@ -326,6 +352,9 @@
       settings = data;
       document.querySelector(`input[name="openStatus"][value="${settings.isOpen}"]`).checked = true;
       document.getElementById('shopPhone').value = settings.phone || '0962577855';
+      document.querySelector(`input[name="promoEnabled"][value="${settings.promoEnabled}"]`).checked = true;
+      document.getElementById('promoText').value = settings.promoText || '';
+      document.getElementById('promoSubtext').value = settings.promoSubtext || '';
     } catch (err) {
       console.error('Failed to load settings', err);
     }
@@ -334,11 +363,14 @@
   async function saveSettings() {
     const isOpen = document.querySelector('input[name="openStatus"]:checked').value === 'true';
     const phone = document.getElementById('shopPhone').value.trim();
+    const promoEnabled = document.querySelector('input[name="promoEnabled"]:checked').value === 'true';
+    const promoText = document.getElementById('promoText').value.trim();
+    const promoSubtext = document.getElementById('promoSubtext').value.trim();
     try {
-      await callApi('/api/settings', 'PUT', { isOpen, phone });
+      await callApi('/api/settings', 'PUT', { isOpen, phone, promoEnabled, promoText, promoSubtext });
       document.getElementById('settingsMessage').innerHTML = '<div class="alert">✅ ቅንብሮች ተቀመጡ!</div>';
       setTimeout(() => document.getElementById('settingsMessage').innerHTML = '', 2000);
-      settings = { isOpen, phone };
+      settings = { isOpen, phone, promoEnabled, promoText, promoSubtext };
     } catch (err) {
       document.getElementById('settingsMessage').innerHTML = `<div class="alert error">❌ ${err.message}</div>`;
     }
