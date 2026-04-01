@@ -20,7 +20,6 @@
       min-height: 100vh;
     }
 
-    /* smooth scroll */
     html {
       scroll-behavior: smooth;
     }
@@ -30,7 +29,7 @@
       margin: 0 auto;
     }
 
-    /* ========== HERO (refined, compact) ========== */
+    /* Hero */
     .hero {
       background: linear-gradient(135deg, #0a2540 0%, #1c4e6f 100%);
       border-radius: 28px;
@@ -92,7 +91,7 @@
       background: #DC3545;
     }
 
-    /* ========== PROMO BANNER (little & dismissible) ========== */
+    /* Promo Banner */
     .promo-banner {
       background: linear-gradient(105deg, #f9b43a 0%, #fb8c00 100%);
       border-radius: 60px;
@@ -152,7 +151,7 @@
       background: rgba(0,0,0,0.35);
     }
 
-    /* ========== FILTER BAR – compact, pro ========== */
+    /* Filter Bar */
     .filter-bar {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(12px);
@@ -211,7 +210,7 @@
       transform: scale(0.96);
     }
 
-    /* ========== PRODUCT GRID – denser, smaller items ========== */
+    /* Product Grid */
     .product-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -232,7 +231,6 @@
       }
     }
 
-    /* Compact product card — smaller, pro styling */
     .card {
       background: #ffffff;
       border-radius: 20px;
@@ -318,7 +316,6 @@
       overflow: hidden;
     }
 
-    /* Smaller call button, but still tappable */
     .call-btn {
       display: flex;
       align-items: center;
@@ -402,7 +399,7 @@
       border-top: 1px solid rgba(0,0,0,0.05);
     }
 
-    /* ========== LIGHTBOX – premium & smooth ========== */
+    /* Lightbox */
     .lightbox {
       display: none;
       position: fixed;
@@ -493,6 +490,70 @@
       font-weight: 500;
     }
 
+    /* Toast Notification */
+    .toast-notification {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: #fff;
+      border-radius: 60px;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2), 0 8px 10px -6px rgba(0,0,0,0.1);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 1500;
+      animation: slideUp 0.3s ease-out;
+      backdrop-filter: blur(8px);
+      background: rgba(255,255,255,0.95);
+      border: 1px solid rgba(255,255,255,0.8);
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .toast-content {
+      flex: 1;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .toast-content strong {
+      font-weight: 800;
+      color: #1c5a7a;
+    }
+
+    .toast-call {
+      background: #0F9D58;
+      color: white;
+      border: none;
+      border-radius: 40px;
+      padding: 8px 16px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .toast-close {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #666;
+      padding: 0 4px;
+    }
+
     @media (max-width: 520px) {
       body {
         padding: 10px;
@@ -537,6 +598,12 @@
         padding: 7px 10px;
         font-size: 0.7rem;
       }
+      .toast-notification {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        padding: 10px 12px;
+      }
     }
   </style>
 </head>
@@ -549,17 +616,17 @@
     <div id="openStatus" class="open-status">...</div>
   </div>
 
-  <!-- 🎯 PROMO BANNER (little promotional banner, dismissible) -->
-  <div id="promoBanner" class="promo-banner">
+  <!-- Promo Banner (dynamic from settings) -->
+  <div id="promoBanner" class="promo-banner" style="display: none;">
     <div class="promo-text">
       <span>🎉</span>
-      <span>ልዩ ቅናሽ! ከ 3000 ብር በላይ ግዢ ➕ ነጻ ማጓጓዝ</span>
-      <strong>ለጊዜው ብቻ</strong>
+      <span id="promoText">ልዩ ቅናሽ!</span>
+      <strong id="promoSubtext">ለጊዜው ብቻ</strong>
     </div>
     <button class="close-banner" id="closePromoBtn" aria-label="Close">✕</button>
   </div>
 
-  <!-- Filter bar (search + categories) -->
+  <!-- Filter bar -->
   <div class="filter-bar">
     <input type="text" id="searchInput" class="search-input" placeholder="🔍 ምርቶችን ፈልግ (ስም፣ መግለጫ)" autocomplete="off">
     <div class="category-chips" id="categoryFilters">
@@ -592,6 +659,10 @@
   let currentSearch = '';
   let lightboxImages = [];
   let lightboxIndex = 0;
+  let promoSettings = { enabled: true, text: '', subtext: '' };
+
+  // Toast notification timer
+  let toastTimeout = null;
 
   const categoryTranslation = {
     'All': 'ሁሉም',
@@ -600,14 +671,10 @@
     'Tablet': 'ታብሌት'
   };
 
-  // ----- Banner dismiss logic (session only, pro) -----
+  // ---- Banner dismiss logic (session only) ----
   const promoBanner = document.getElementById('promoBanner');
   const closePromo = document.getElementById('closePromoBtn');
   if (closePromo) {
-    // Check sessionStorage to keep banner hidden for current session if dismissed
-    if (sessionStorage.getItem('primePromoClosed') === 'true') {
-      if (promoBanner) promoBanner.style.display = 'none';
-    }
     closePromo.addEventListener('click', () => {
       if (promoBanner) {
         promoBanner.style.display = 'none';
@@ -616,7 +683,7 @@
     });
   }
 
-  // ----- fetch settings (open status, phone) -----
+  // ---- Fetch settings (open status, phone, promo) ----
   async function fetchSettings() {
     try {
       const res = await fetch('/api/settings');
@@ -624,7 +691,11 @@
       shopPhone = data.phone || '0962577855';
       shopName = data.shopName || 'Prime Mobile';
       isOpen = data.isOpen !== undefined ? data.isOpen : true;
+      promoSettings.enabled = data.promoEnabled !== undefined ? data.promoEnabled : true;
+      promoSettings.text = data.promoText || 'ልዩ ቅናሽ! ከ 3000 ብር በላይ ግዢ ➕ ነጻ ማጓጓዝ';
+      promoSettings.subtext = data.promoSubtext || 'ለጊዜው ብቻ';
       updateOpenStatus();
+      updatePromoBanner();
     } catch (err) {
       console.warn('Could not load settings');
     }
@@ -641,7 +712,22 @@
     }
   }
 
-  // ----- fetch categories from server (distinct) -----
+  function updatePromoBanner() {
+    if (!promoBanner) return;
+    const textSpan = document.getElementById('promoText');
+    const subtextSpan = document.getElementById('promoSubtext');
+    if (textSpan) textSpan.innerText = promoSettings.text;
+    if (subtextSpan) subtextSpan.innerText = promoSettings.subtext;
+
+    // Show banner only if enabled and not dismissed in this session
+    if (promoSettings.enabled && sessionStorage.getItem('primePromoClosed') !== 'true') {
+      promoBanner.style.display = 'flex';
+    } else {
+      promoBanner.style.display = 'none';
+    }
+  }
+
+  // ---- Fetch categories from server ----
   async function fetchCategories() {
     try {
       const res = await fetch('/api/categories');
@@ -663,7 +749,7 @@
     }
   }
 
-  // ----- load products from API -----
+  // ---- Load products from API ----
   async function loadProducts() {
     const container = document.getElementById('productList');
     try {
@@ -671,13 +757,15 @@
       if (!res.ok) throw new Error('Failed to fetch');
       allProducts = await res.json();
       filterAndRender();
+      // Start random notifications after products are loaded
+      startRandomNotifications();
     } catch (err) {
       container.innerHTML = '<div class="error-msg">⚠️ ምርቶችን መጫን አልተቻለም። ኔትዎርክ ይፈትሹ።</div>';
       console.error(err);
     }
   }
 
-  // ----- render with filters (smaller cards already styled) -----
+  // ---- Render products with filters ----
   function filterAndRender() {
     const container = document.getElementById('productList');
     let filtered = [...allProducts];
@@ -730,7 +818,7 @@
     });
   }
 
-  // ----- Lightbox controls (premium feel) -----
+  // ---- Lightbox with history API for back button ----
   function openLightbox(images, index, productName) {
     if (!images.length) return;
     lightboxImages = images;
@@ -742,11 +830,19 @@
     counter.innerText = `${index+1} / ${images.length}  •  ${productName}`;
     lightbox.classList.add('active');
     document.body.style.overflow = 'hidden';
+    // Push state to enable back button to close lightbox
+    history.pushState({ lightboxOpen: true }, '');
   }
 
   function closeLightbox() {
-    document.getElementById('lightbox').classList.remove('active');
+    const lightbox = document.getElementById('lightbox');
+    if (!lightbox.classList.contains('active')) return;
+    lightbox.classList.remove('active');
     document.body.style.overflow = '';
+    // Remove the state we pushed
+    if (history.state && history.state.lightboxOpen) {
+      history.back(); // this triggers popstate, but we need to avoid infinite loop
+    }
   }
 
   function nextImage() {
@@ -775,13 +871,74 @@
     });
   }
 
+  // ---- Random Notification Toast ----
+  function showRandomProductNotification() {
+    // Only if products are loaded and we have at least one
+    if (!allProducts.length) return;
+
+    // Get currently filtered products (respects search & category)
+    let filtered = [...allProducts];
+    if (currentCategory !== 'All') {
+      filtered = filtered.filter(p => p.category === currentCategory);
+    }
+    if (currentSearch.trim()) {
+      const term = currentSearch.toLowerCase();
+      filtered = filtered.filter(p => 
+        p.name.toLowerCase().includes(term) || 
+        p.description.toLowerCase().includes(term)
+      );
+    }
+    if (filtered.length === 0) return;
+
+    const randomIndex = Math.floor(Math.random() * filtered.length);
+    const product = filtered[randomIndex];
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.innerHTML = `
+      <div class="toast-content">
+        🎁 <strong>${escapeHtml(product.name)}</strong> — በ${product.price.toLocaleString()} ብር ብቻ!<br>
+        <small>ለመግዛት ይደውሉልን</small>
+      </div>
+      <a href="tel:${shopPhone}" class="toast-call">📞 ይደውሉ</a>
+      <button class="toast-close" aria-label="Close">✕</button>
+    `;
+
+    // Add close functionality
+    const closeBtn = toast.querySelector('.toast-close');
+    closeBtn.addEventListener('click', () => {
+      toast.remove();
+      if (toastTimeout) clearTimeout(toastTimeout);
+    });
+
+    document.body.appendChild(toast);
+
+    // Auto-remove after 6 seconds
+    toastTimeout = setTimeout(() => {
+      if (toast && toast.parentNode) toast.remove();
+    }, 6000);
+  }
+
+  function startRandomNotifications() {
+    // Start a timer that triggers a notification after random delay (30-90 seconds)
+    function scheduleNotification() {
+      const delay = Math.floor(Math.random() * (90000 - 30000 + 1) + 30000); // 30-90 sec
+      setTimeout(() => {
+        showRandomProductNotification();
+        scheduleNotification(); // re-schedule after each
+      }, delay);
+    }
+    scheduleNotification();
+  }
+
   // ---- Search input listener ----
   document.getElementById('searchInput').addEventListener('input', (e) => {
     currentSearch = e.target.value;
     filterAndRender();
   });
 
-  // ---- Lightbox event binding ----
+  // ---- Lightbox event binding & back button handling ----
   const lightboxEl = document.getElementById('lightbox');
   lightboxEl.addEventListener('click', (e) => {
     if (e.target === lightboxEl || e.target.classList.contains('close')) closeLightbox();
@@ -793,6 +950,22 @@
   document.querySelector('.next').addEventListener('click', (e) => {
     e.stopPropagation();
     nextImage();
+  });
+
+  // Handle browser back button when lightbox is open
+  window.addEventListener('popstate', (event) => {
+    if (lightboxEl.classList.contains('active')) {
+      closeLightbox();
+      // Prevent the back navigation from actually leaving the page
+      // We already called closeLightbox, now we need to prevent the default back behavior
+      // by pushing a new state? Actually we want to stay on the page after closing.
+      // Since we closed it, we can just not navigate away. But the popstate event already
+      // changed the URL; we can push a new state to keep the current URL.
+      if (!event.state || !event.state.lightboxOpen) {
+        // After closing, we can push a new state to avoid leaving the page
+        history.pushState(null, '');
+      }
+    }
   });
 
   // Swipe support for mobile
@@ -817,18 +990,11 @@
     if (e.key === 'Escape') closeLightbox();
   });
 
-  // ---- update call links dynamically when phone changes? (no need, but when settings fetch updates) 
-  // We'll refresh the product list if needed, but phone is updated only via settings fetch, product render uses shopPhone var.
-  // Ensure that whenever we re-render, we use latest shopPhone (already global).
-  // Also we could add event to re-render on settings change, but admin panel may update; it's enough to reload on next page load or we can add a periodic check? not necessary.
-  // To be pro, we can re-fetch settings before each render? But product list already uses shopPhone variable which is set on load.
-  // It will survive unless admin changes, then page refresh will fetch new. Acceptable.
-
-  // ---- INITIALIZE ----
+  // ---- Initialize ----
   window.addEventListener('DOMContentLoaded', async () => {
-    await fetchSettings();      // gets shopPhone, open status
-    await fetchCategories();    // load dynamic category chips
-    await loadProducts();       // render products with smaller card style
+    await fetchSettings();
+    await fetchCategories();
+    await loadProducts();
   });
 </script>
 </body>
