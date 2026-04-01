@@ -16,7 +16,7 @@
       padding: 20px;
     }
     .container {
-      max-width: 700px;
+      max-width: 900px;
       margin: 0 auto;
     }
     .card {
@@ -30,6 +30,9 @@
       font-size: 1.5rem;
       margin-bottom: 16px;
       color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     .login-box {
       text-align: center;
@@ -55,6 +58,11 @@
       cursor: pointer;
       margin-top: 8px;
       font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    button:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
     }
     button.danger {
       background: #ef4444;
@@ -71,6 +79,17 @@
       gap: 12px;
       align-items: center;
       flex-wrap: wrap;
+      transition: all 0.2s;
+    }
+    .product-item:hover {
+      background: #f1f5f9;
+    }
+    .product-img-thumb {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 12px;
+      background: #e2e8f0;
     }
     .product-info {
       flex: 3;
@@ -86,6 +105,7 @@
       width: auto;
       padding: 6px 14px;
       font-size: 0.75rem;
+      margin-top: 0;
     }
     hr {
       margin: 20px 0;
@@ -101,6 +121,35 @@
       background: #fee2e2;
       color: #991b1b;
     }
+    .image-preview {
+      margin: 8px 0;
+      max-width: 100%;
+      max-height: 150px;
+      border-radius: 12px;
+      display: none;
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .logout-btn {
+      background: #64748b;
+      width: auto;
+      padding: 8px 16px;
+      margin-top: 0;
+    }
+    .search-box {
+      margin-bottom: 20px;
+    }
+    .stats {
+      background: #f1f5f9;
+      padding: 8px 12px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
@@ -113,12 +162,18 @@
   </div>
 
   <div id="adminPanel" style="display: none;">
+    <div class="admin-header">
+      <h2>📦 Product Manager</h2>
+      <button class="logout-btn" id="logoutBtn">🚪 Logout</button>
+    </div>
+    
     <div class="card">
       <h2>➕ Add New Product</h2>
       <input type="text" id="name" placeholder="Product name *" required>
       <textarea id="description" rows="2" placeholder="Description *"></textarea>
       <input type="number" id="price" placeholder="Price (₹) *" required>
       <input type="url" id="imageUrl" placeholder="Image URL * (e.g., https://...jpg)" required>
+      <img id="imagePreview" class="image-preview" alt="Preview">
       <select id="category">
         <option value="Phone">📱 Phone</option>
         <option value="Accessory">🎧 Accessory</option>
@@ -129,7 +184,13 @@
     </div>
 
     <div class="card">
-      <h2>📦 Manage Products</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+        <h2 style="margin-bottom: 0;">📋 Manage Products</h2>
+        <div class="stats" id="productCount">0 products</div>
+      </div>
+      <div class="search-box">
+        <input type="text" id="adminSearch" placeholder="🔍 Search products by name or description..." style="margin-bottom: 0;">
+      </div>
       <div id="productListAdmin"></div>
     </div>
   </div>
@@ -137,7 +198,8 @@
 
 <script>
   let adminKey = null;
-  let products = [];
+  let allProducts = [];
+  let searchTerm = '';
 
   async function callApi(endpoint, method = 'GET', body = null) {
     const headers = {
@@ -162,8 +224,9 @@
     try {
       const data = await callApi('/api/products');
       if (data) {
-        products = data;
+        allProducts = data;
         renderProductList();
+        document.getElementById('productCount').innerText = `${allProducts.length} product${allProducts.length !== 1 ? 's' : ''}`;
       }
     } catch (err) {
       document.getElementById('productListAdmin').innerHTML = `<div class="alert error">Failed to load: ${err.message}</div>`;
@@ -172,16 +235,29 @@
 
   function renderProductList() {
     const container = document.getElementById('productListAdmin');
-    if (!products.length) {
-      container.innerHTML = '<div class="alert">No products yet. Add your first item!</div>';
+    let filtered = allProducts;
+    
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      filtered = allProducts.filter(p => 
+        p.name.toLowerCase().includes(term) || 
+        p.description.toLowerCase().includes(term) ||
+        p.category.toLowerCase().includes(term)
+      );
+    }
+    
+    if (!filtered.length) {
+      container.innerHTML = '<div class="alert">No products found.</div>';
       return;
     }
-    container.innerHTML = products.map(p => `
+    
+    container.innerHTML = filtered.map(p => `
       <div class="product-item" data-id="${p._id}">
+        <img class="product-img-thumb" src="${escapeHtml(p.imageUrl)}" onerror="this.src='https://placehold.co/60x60?text=No+Image'" alt="thumbnail">
         <div class="product-info">
           <div class="product-name-admin">${escapeHtml(p.name)}</div>
-          <div>₹${p.price} | ${p.category}</div>
-          <small>${p.description.substring(0, 60)}...</small>
+          <div>₹${p.price.toLocaleString()} | ${escapeHtml(p.category)}</div>
+          <small>${escapeHtml(p.description.substring(0, 60))}${p.description.length > 60 ? '...' : ''}</small>
         </div>
         <div class="product-actions">
           <button class="secondary" onclick="editProduct('${p._id}')">✏️ Edit</button>
@@ -206,10 +282,13 @@
     try {
       await callApi('/api/products', 'POST', { name, description, price, imageUrl, category });
       document.getElementById('addMessage').innerHTML = '<div class="alert">✅ Product added!</div>';
+      // Clear form
       document.getElementById('name').value = '';
       document.getElementById('description').value = '';
       document.getElementById('price').value = '';
       document.getElementById('imageUrl').value = '';
+      document.getElementById('imagePreview').style.display = 'none';
+      document.getElementById('imagePreview').src = '';
       loadProducts();
       setTimeout(() => document.getElementById('addMessage').innerHTML = '', 2000);
     } catch (err) {
@@ -228,7 +307,7 @@
   }
 
   window.editProduct = async function(id) {
-    const product = products.find(p => p._id === id);
+    const product = allProducts.find(p => p._id === id);
     if (!product) return;
     const newName = prompt('Edit product name:', product.name);
     if (newName === null) return;
@@ -259,6 +338,7 @@
     document.getElementById('loginPanel').style.display = 'block';
     document.getElementById('adminPanel').style.display = 'none';
     document.getElementById('adminPassword').value = '';
+    document.getElementById('loginError').innerText = '';
   }
 
   function escapeHtml(str) {
@@ -271,6 +351,24 @@
     });
   }
 
+  // Image preview
+  document.getElementById('imageUrl').addEventListener('input', (e) => {
+    const url = e.target.value;
+    const preview = document.getElementById('imagePreview');
+    if (url && (url.startsWith('http') || url.startsWith('https'))) {
+      preview.src = url;
+      preview.style.display = 'block';
+    } else {
+      preview.style.display = 'none';
+    }
+  });
+
+  // Search in admin panel
+  document.getElementById('adminSearch').addEventListener('input', (e) => {
+    searchTerm = e.target.value;
+    renderProductList();
+  });
+
   document.getElementById('loginBtn').onclick = async () => {
     const pwd = document.getElementById('adminPassword').value;
     if (!pwd) return;
@@ -279,11 +377,13 @@
       const res = await fetch('/api/products', { headers: { 'x-admin-key': adminKey } });
       if (res.status === 401) throw new Error('Wrong password');
       const data = await res.json();
-      products = data;
+      allProducts = data;
       document.getElementById('loginPanel').style.display = 'none';
       document.getElementById('adminPanel').style.display = 'block';
       renderProductList();
+      document.getElementById('productCount').innerText = `${allProducts.length} product${allProducts.length !== 1 ? 's' : ''}`;
       document.getElementById('addProductBtn').onclick = addProduct;
+      document.getElementById('logoutBtn').onclick = logout;
     } catch (err) {
       document.getElementById('loginError').innerText = '❌ Incorrect admin password';
       adminKey = null;
