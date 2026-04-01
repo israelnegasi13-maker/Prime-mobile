@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Mobile Shop | Best Phones & Accessories</title>
+  <title>Mobile Hub | Best Phones & Accessories</title>
   <style>
     * {
       margin: 0;
@@ -38,6 +38,53 @@
       border-left: 4px solid #3b82f6;
       padding-left: 12px;
       font-size: 0.9rem;
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+      background: white;
+      border-radius: 28px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+      background: #f8fafc;
+    }
+
+    .category-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 8px 0 4px;
+    }
+
+    .chip {
+      background: #f1f5f9;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .chip.active {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+    }
+
+    .chip:hover:not(.active) {
+      background: #e2e8f0;
     }
 
     .product-grid {
@@ -132,12 +179,17 @@
       color: #3b82f6;
     }
 
-    .error-msg {
+    .error-msg, .no-results {
       background: #fee2e2;
       color: #b91c1c;
       padding: 16px;
       border-radius: 20px;
       text-align: center;
+    }
+
+    .no-results {
+      background: #fef9c3;
+      color: #854d0e;
     }
 
     footer {
@@ -153,14 +205,25 @@
   <h1>📱 Mobile Hub</h1>
   <div class="subhead">Latest smartphones & accessories — order via WhatsApp</div>
 
+  <div class="filter-bar">
+    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search products...">
+    <div class="category-chips" id="categoryFilters">
+      <div class="chip active" data-category="All">All</div>
+      <!-- Dynamic categories will be added here -->
+    </div>
+  </div>
+
   <div id="productList" class="product-grid">
     <div class="loader">Loading products...</div>
   </div>
-  <footer>© Mobile Shop — contact us for best deals</footer>
+  <footer>© Mobile Hub — contact us for best deals</footer>
 </div>
 
 <script>
-  let shopPhone = '1234567890';
+  let allProducts = [];
+  let shopPhone = '919876543210';
+  let currentCategory = 'All';
+  let currentSearch = '';
 
   async function fetchSettings() {
     try {
@@ -172,36 +235,80 @@
     }
   }
 
+  async function fetchCategories() {
+    try {
+      const res = await fetch('/api/categories');
+      const categories = await res.json();
+      const container = document.getElementById('categoryFilters');
+      container.innerHTML = categories.map(cat => `
+        <div class="chip ${cat === 'All' ? 'active' : ''}" data-category="${cat}">${cat}</div>
+      `).join('');
+      
+      // Add event listeners to chips
+      document.querySelectorAll('.chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          currentCategory = chip.dataset.category;
+          filterAndRender();
+        });
+      });
+    } catch (err) {
+      console.error('Failed to load categories', err);
+    }
+  }
+
   async function loadProducts() {
     const container = document.getElementById('productList');
     try {
       const res = await fetch('/api/products');
       if (!res.ok) throw new Error('Failed to fetch');
-      const products = await res.json();
-
-      if (products.length === 0) {
-        container.innerHTML = '<div class="error-msg">✨ No products yet. Check back soon!</div>';
-        return;
-      }
-
-      container.innerHTML = products.map(product => `
-        <div class="card">
-          <img class="card-img" src="${product.imageUrl}" alt="${product.name}" onerror="this.src='https://placehold.co/600x400?text=No+Image'">
-          <div class="card-content">
-            <span class="category-badge">${escapeHtml(product.category)}</span>
-            <div class="product-name">${escapeHtml(product.name)}</div>
-            <div class="product-price">₹${product.price.toLocaleString()}</div>
-            <div class="product-desc">${escapeHtml(product.description)}</div>
-            <a href="https://wa.me/${shopPhone}?text=Hi! I'm interested in ${encodeURIComponent(product.name)} (₹${product.price})" target="_blank" class="whatsapp-btn">
-              💬 Buy on WhatsApp
-            </a>
-          </div>
-        </div>
-      `).join('');
+      allProducts = await res.json();
+      filterAndRender();
     } catch (err) {
       container.innerHTML = '<div class="error-msg">⚠️ Failed to load products. Please refresh.</div>';
       console.error(err);
     }
+  }
+
+  function filterAndRender() {
+    const container = document.getElementById('productList');
+    
+    let filtered = [...allProducts];
+    
+    // Filter by category
+    if (currentCategory !== 'All') {
+      filtered = filtered.filter(p => p.category === currentCategory);
+    }
+    
+    // Filter by search
+    if (currentSearch.trim()) {
+      const searchTerm = currentSearch.toLowerCase();
+      filtered = filtered.filter(p => 
+        p.name.toLowerCase().includes(searchTerm) || 
+        p.description.toLowerCase().includes(searchTerm)
+      );
+    }
+    
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="no-results">✨ No products match your filters. Try something else!</div>';
+      return;
+    }
+    
+    container.innerHTML = filtered.map(product => `
+      <div class="card">
+        <img class="card-img" src="${escapeHtml(product.imageUrl)}" alt="${escapeHtml(product.name)}" onerror="this.src='https://placehold.co/600x400?text=No+Image'">
+        <div class="card-content">
+          <span class="category-badge">${escapeHtml(product.category)}</span>
+          <div class="product-name">${escapeHtml(product.name)}</div>
+          <div class="product-price">₹${product.price.toLocaleString()}</div>
+          <div class="product-desc">${escapeHtml(product.description)}</div>
+          <a href="https://wa.me/${shopPhone}?text=Hi! I'm interested in ${encodeURIComponent(product.name)} (₹${product.price})" target="_blank" class="whatsapp-btn">
+            💬 Buy on WhatsApp
+          </a>
+        </div>
+      </div>
+    `).join('');
   }
 
   function escapeHtml(str) {
@@ -214,9 +321,16 @@
     });
   }
 
+  // Search input handler
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    currentSearch = e.target.value;
+    filterAndRender();
+  });
+
   window.addEventListener('DOMContentLoaded', async () => {
     await fetchSettings();
-    loadProducts();
+    await fetchCategories();
+    await loadProducts();
   });
 </script>
 </body>
