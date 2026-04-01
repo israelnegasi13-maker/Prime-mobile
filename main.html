@@ -2,34 +2,25 @@
 <html lang="am">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ፕራይም ሞባይል | Prime Mobile</title>
-  
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
     :root {
       --primary: #2563eb;
-      --primary-hover: #1d4ed8;
+      --primary-dark: #1d4ed8;
+      --accent: #f59e0b;
+      --bg-color: #f8fafc;
       --surface: #ffffff;
-      --background: #f8fafc;
       --text-main: #0f172a;
       --text-muted: #64748b;
       --border: #e2e8f0;
-      --radius-sm: 8px;
-      --radius-md: 16px;
-      --radius-lg: 24px;
-      --radius-xl: 32px;
-      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --radius-sm: 12px;
+      --radius-md: 20px;
+      --radius-lg: 28px;
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
     }
 
     * {
@@ -37,396 +28,382 @@
       padding: 0;
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
     }
 
     body {
-      background-color: var(--background);
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-color);
       color: var(--text-main);
-      line-height: 1.5;
-      min-height: 100vh;
+      padding-bottom: 80px; /* Space for mobile scrolling */
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* --- PROMO BANNER --- */
+    .promo-banner {
+      background: linear-gradient(90deg, #4f46e5, #ec4899, #f59e0b);
+      background-size: 200% auto;
+      color: white;
+      text-align: center;
+      padding: 10px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      animation: gradientFlow 5s ease infinite;
+    }
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
-
-    /* Navbar (Glassmorphism) */
-    .navbar {
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    /* --- HEADER --- */
+    .app-header {
+      background: var(--surface);
       padding: 16px 20px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .navbar-content {
-      max-width: 1200px;
-      margin: 0 auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 16px;
     }
 
-    .logo {
-      font-size: 1.25rem;
-      font-weight: 700;
+    .brand-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .brand-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
       color: var(--text-main);
-      text-decoration: none;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .logo i {
-      color: var(--primary);
+    .brand-title svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--primary);
     }
 
-    .search-container {
-      position: relative;
-      flex: 1;
-      max-width: 400px;
-    }
-
-    .search-container i {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      width: 18px;
-      height: 18px;
-    }
-
-    .search-input {
-      width: 100%;
-      padding: 12px 16px 12px 40px;
-      border-radius: 99px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      font-family: inherit;
-      font-size: 0.95rem;
-      transition: var(--transition);
-      outline: none;
-    }
-
-    .search-input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-
-    /* Main Container */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 24px 20px;
-      flex: 1;
-      width: 100%;
-    }
-
-    /* Hero Section */
-    .hero {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      border-radius: var(--radius-xl);
-      padding: 48px 32px;
-      color: white;
-      text-align: center;
-      margin-bottom: 32px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: var(--shadow-lg);
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 60%);
-      pointer-events: none;
-    }
-
-    .hero h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 12px;
-      line-height: 1.2;
-      background: linear-gradient(to right, #ffffff, #94a3b8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .hero p {
-      font-size: 1.1rem;
-      color: #cbd5e1;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    /* Category Chips */
-    .categories {
-      display: flex;
-      gap: 12px;
-      overflow-x: auto;
-      padding-bottom: 12px;
-      margin-bottom: 24px;
-      scrollbar-width: none;
-    }
-    
-    .categories::-webkit-scrollbar {
-      display: none;
-    }
-
-    .chip {
-      padding: 10px 20px;
-      border-radius: 99px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text-main);
-      font-weight: 500;
-      font-size: 0.9rem;
-      white-space: nowrap;
-      cursor: pointer;
-      transition: var(--transition);
-      display: flex;
+    /* Status Badge (Preserved Logic) */
+    .status-badge {
+      display: inline-flex;
       align-items: center;
       gap: 6px;
-      box-shadow: var(--shadow-sm);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      width: fit-content;
+      transition: all 0.3s ease;
     }
-
-    .chip:hover {
-      border-color: var(--primary);
-      background: #f0fdf4; /* Subtle hint on hover */
+    .status-open {
+      background: #dcfce7;
+      color: #166534;
     }
-
-    .chip.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    .status-closed {
+      background: #fee2e2;
+      color: #991b1b;
     }
+    #statusIcon { font-size: 0.7rem; }
 
-    /* Products Grid */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 24px;
-    }
-
-    /* Product Card */
-    .card {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      padding: 16px;
-      box-shadow: var(--shadow-md);
-      transition: var(--transition);
+    .header-actions {
       display: flex;
-      flex-direction: column;
-      border: 1px solid rgba(0,0,0,0.02);
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
+      gap: 12px;
     }
 
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .card-img-wrapper {
-      width: 100%;
-      aspect-ratio: 1;
-      border-radius: var(--radius-md);
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
       background: #f1f5f9;
-      margin-bottom: 16px;
-      overflow: hidden;
-      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
+      color: var(--text-main);
+      text-decoration: none;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .icon-btn:active {
+      transform: scale(0.92);
+      background: #e2e8f0;
+    }
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+    .icon-btn.telegram { color: #0088cc; background: #e0f2fe; }
+
+    /* --- STICKY CONTROLS (Search & Categories) --- */
+    .sticky-controls {
+      position: sticky;
+      top: 0;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 50;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    .card-img-wrapper img {
+    .search-box {
+      position: relative;
+      width: 100%;
+    }
+    .search-box svg {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 20px;
+      height: 20px;
+    }
+    .search-box input {
+      width: 100%;
+      background: var(--bg-color);
+      border: 1px solid var(--border);
+      padding: 14px 16px 14px 44px;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-box input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+
+    .categories {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+    .categories::-webkit-scrollbar {
+      display: none;
+    }
+    .category-chip {
+      background: var(--bg-color);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .category-chip.active {
+      background: var(--text-main);
+      color: white;
+      border-color: var(--text-main);
+    }
+
+    /* --- PRODUCT GRID --- */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    @media (min-width: 768px) {
+      .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 24px;
+      }
+    }
+
+    .product-card {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(0,0,0,0.03);
+    }
+    .product-card:active {
+      transform: scale(0.98);
+    }
+
+    .product-image-wrapper {
+      position: relative;
+      padding-top: 100%; /* 1:1 Aspect Ratio */
+      background: #f1f5f9;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .product-image-wrapper img {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       object-fit: contain;
-      transition: transform 0.5s ease;
-      padding: 12px;
+      padding: 16px;
+      transition: transform 0.3s ease;
     }
-
-    .card:hover .card-img-wrapper img {
+    .product-card:hover .product-image-wrapper img {
       transform: scale(1.05);
     }
-
-    .fallback-icon {
-      color: var(--text-muted);
-      opacity: 0.5;
+    .image-badge {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      color: white;
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+      z-index: 2;
     }
 
-    .card-content {
-      flex: 1;
+    .product-info {
+      padding: 16px;
       display: flex;
       flex-direction: column;
+      flex-grow: 1;
     }
-
-    .card-category {
+    .product-category {
       font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
       color: var(--primary);
+      text-transform: uppercase;
       font-weight: 700;
+      letter-spacing: 0.5px;
       margin-bottom: 4px;
     }
-
-    .card-title {
-      font-size: 1.1rem;
-      font-weight: 600;
+    .product-title {
+      font-size: 1rem;
+      font-weight: 700;
       color: var(--text-main);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       line-height: 1.3;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
-
-    .card-desc {
+    .product-desc {
       font-size: 0.85rem;
       color: var(--text-muted);
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      flex: 1;
     }
-
-    .card-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .product-bottom {
       margin-top: auto;
-      padding-top: 12px;
-      border-top: 1px solid var(--border);
-    }
-
-    .card-price {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: var(--text-main);
-    }
-
-    .card-price span {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    .btn-view {
-      background: var(--background);
-      color: var(--text-main);
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: var(--transition);
-    }
-
-    .card:hover .btn-view {
-      background: var(--primary);
-      color: white;
-    }
-
-    /* Skeleton Loading */
-    .skeleton {
-      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
-      background-size: 200% 100%;
-      animation: loading 1.5s infinite;
-      border-radius: var(--radius-sm);
-    }
-
-    @keyframes loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-
-    .skeleton-card {
-      height: 380px;
-      border-radius: var(--radius-lg);
-    }
-
-    /* Lightbox */
-    .lightbox {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(15, 23, 42, 0.95);
-      backdrop-filter: blur(8px);
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-
-    .lightbox.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .lightbox-content {
-      position: relative;
-      width: 100%;
-      max-width: 800px;
-      height: 100%;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      gap: 12px;
+    }
+    .product-price {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    
+    .order-btn {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
       justify-content: center;
-      padding: 20px;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .order-btn:active {
+      background: var(--primary-dark);
     }
 
-    .lightbox-img-container {
-      flex: 1;
-      width: 100%;
+    /* --- LIGHTBOX --- */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .lightbox.active {
+      display: flex;
+      opacity: 1;
+    }
+    .lightbox-header {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+      color: white;
+      z-index: 10;
+    }
+    .lightbox-close {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .lightbox-content {
+      flex-grow: 1;
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
     }
-
-    .lightbox img {
+    .lightbox-img {
       max-width: 100%;
       max-height: 80vh;
       object-fit: contain;
-      border-radius: var(--radius-md);
-      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+      transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
-
     .lightbox-controls {
       position: absolute;
-      top: 24px;
-      right: 24px;
+      top: 50%;
+      left: 0;
+      right: 0;
+      transform: translateY(-50%);
       display: flex;
-      gap: 16px;
-      z-index: 101;
+      justify-content: space-between;
+      padding: 0 16px;
+      pointer-events: none;
     }
-
-    .icon-btn {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+    .lightbox-btn {
+      pointer-events: auto;
+      background: rgba(255,255,255,0.2);
+      border: none;
       color: white;
       width: 44px;
       height: 44px;
@@ -434,462 +411,365 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      backdrop-filter: blur(4px);
       cursor: pointer;
-      transition: var(--transition);
     }
-
-    .icon-btn:hover {
-      background: white;
-      color: var(--text-main);
-    }
-
-    .nav-btn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      border: none;
-      transition: var(--transition);
-      z-index: 101;
-    }
-
-    .nav-btn:hover {
-      background: white;
-      color: var(--text-main);
-    }
-
-    .nav-btn.prev { left: 20px; }
-    .nav-btn.next { right: 20px; }
-
-    .lightbox-info {
-      background: white;
-      width: 100%;
-      padding: 24px;
-      border-radius: var(--radius-lg);
-      margin-top: 20px;
+    .lightbox-counter {
       text-align: center;
+      color: rgba(255,255,255,0.7);
+      padding: 20px;
+      font-weight: 500;
     }
 
-    .lightbox-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .lightbox-desc {
+    /* States */
+    .loader {
+      text-align: center;
+      padding: 40px;
       color: var(--text-muted);
-      margin-bottom: 16px;
-    }
-
-    .lightbox-price {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--primary);
-    }
-
-    /* Status Banner */
-    .status-banner {
-      background: #fee2e2;
-      color: #991b1b;
-      text-align: center;
-      padding: 12px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      display: none;
-    }
-
-    .status-banner.show {
-      display: block;
-    }
-
-    /* Footer */
-    footer {
-      text-align: center;
-      padding: 32px 20px;
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      border-top: 1px solid var(--border);
-      margin-top: auto;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .hero {
-        padding: 32px 20px;
-      }
-      .hero h1 {
-        font-size: 2rem;
-      }
-      .nav-btn {
-        display: none; /* Rely on swipe for mobile */
-      }
-    }
-    
-    .empty-state {
       grid-column: 1 / -1;
-      text-align: center;
-      padding: 64px 20px;
-      color: var(--text-muted);
     }
-    
-    .empty-state i {
-      width: 64px;
-      height: 64px;
-      margin-bottom: 16px;
-      opacity: 0.5;
+    .spinner {
+      border: 3px solid rgba(0,0,0,0.1);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px auto;
     }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
-  <!-- Store Status Banner -->
-  <div id="statusBanner" class="status-banner">
-    <i data-lucide="info" style="width:16px; height:16px; display:inline-block; vertical-align:middle; margin-right:4px;"></i>
-    ሱቁ በአሁኑ ሰዓት ዝግ ነው። (Store is currently closed)
+  <!-- Promo Banner -->
+  <div class="promo-banner">
+    <span>✨ <strong>ልዩ ቅናሽ (Special Offer):</strong> ምርጥ ስልኮች እና መለዋወጫዎች በቅናሽ ዋጋ!</span>
   </div>
 
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="navbar-content">
-      <a href="#" class="logo">
-        <i data-lucide="smartphone"></i>
-        <span>ፕራይም ሞባይል</span>
-      </a>
-      <div class="search-container">
-        <i data-lucide="search"></i>
-        <input type="text" id="searchInput" class="search-input" placeholder="ስልክ ወይም መለዋወጫ ይፈልጉ...">
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand-container">
+      <h1 class="brand-title">
+        <svg viewBox="0 0 24 24"><path d="M17,1H7A2,2 0 0,0 5,3V21A2,2 0 0,0 7,23H17A2,2 0 0,0 19,21V3A2,2 0 0,0 17,1M17,19H7V5H17V19M16,13H13V8H11V13H8L12,17L16,13Z"/></svg>
+        Prime Mobile
+      </h1>
+      <!-- Preserved Open/Close Badge Logic -->
+      <div id="statusBadge" class="status-badge status-open">
+        <span id="statusIcon">🟢</span>
+        <span id="statusText">ክፍት ነው (Open)</span>
       </div>
     </div>
-  </nav>
-
-  <!-- Main Content -->
-  <main class="container">
     
-    <!-- Hero Section -->
-    <section class="hero">
-      <h1>የእርስዎን ምርጥ ስልክ ያግኙ</h1>
-      <p>ኦሪጅናል ስማርትፎኖች፣ ታብሌቶች እና መለዋወጫዎች በተመጣጣኝ ዋጋ። ጥራት ያለው አገልግሎት ከእኛ ጋር።</p>
-    </section>
+    <div class="header-actions">
+      <a href="#" id="phoneLink" class="icon-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62,10.79C8.06,13.62 10.38,15.94 13.21,17.38L15.41,15.18C15.69,14.9 16.08,14.82 16.43,14.93C17.55,15.3 18.75,15.5 20,15.5A1,1 0 0,1 21,16.5V20A1,1 0 0,1 20,21A17,17 0 0,1 3,4A1,1 0 0,1 4,3H7.5A1,1 0 0,1 8.5,4C8.5,5.25 8.7,6.45 9.07,7.57C9.18,7.92 9.1,8.31 8.82,8.59L6.62,10.79Z"/></svg>
+      </a>
+      <a href="#" id="telegramLink" class="icon-btn telegram">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.78,18.65L10.06,14.42L17.74,7.5C18.08,7.19 17.67,7.04 17.22,7.31L7.74,13.3L3.64,12C2.76,11.75 2.75,11.14 3.84,10.7L19.81,4.54C20.54,4.21 21.24,4.72 20.96,5.84L18.24,18.65C18.05,19.56 17.5,19.78 16.74,19.36L12.6,16.3L10.61,18.23C10.38,18.46 10.19,18.65 9.78,18.65Z"/></svg>
+      </a>
+    </div>
+  </header>
 
-    <!-- Categories -->
+  <!-- Sticky Controls -->
+  <div class="sticky-controls">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/></svg>
+      <input type="text" id="searchInput" placeholder="ምርት ይፈልጉ... (Search products)">
+    </div>
     <div class="categories" id="categoryTabs">
-      <button class="chip active" data-category="All">
-        <i data-lucide="layout-grid" style="width: 16px; height: 16px;"></i> ሁሉም (All)
-      </button>
-      <button class="chip" data-category="Phone">
-        <i data-lucide="smartphone" style="width: 16px; height: 16px;"></i> ስልኮች (Phones)
-      </button>
-      <button class="chip" data-category="Tablet">
-        <i data-lucide="tablet" style="width: 16px; height: 16px;"></i> ታብሌቶች (Tablets)
-      </button>
-      <button class="chip" data-category="Accessory">
-        <i data-lucide="headphones" style="width: 16px; height: 16px;"></i> መለዋወጫዎች (Accessories)
-      </button>
+      <div class="category-chip active" data-cat="All">ሁሉም (All)</div>
+      <div class="category-chip" data-cat="Phone">ስልኮች (Phones)</div>
+      <div class="category-chip" data-cat="Accessory">መለዋወጫ (Accessories)</div>
+      <div class="category-chip" data-cat="Tablet">ታብሌት (Tablets)</div>
     </div>
+  </div>
 
-    <!-- Products Grid -->
-    <div class="grid" id="productList">
-      <!-- Skeletons will load here initially -->
+  <!-- Product Grid -->
+  <main class="product-grid" id="productGrid">
+    <div class="loader">
+      <div class="spinner"></div>
+      <p>ምርቶች በመጫን ላይ ናቸው... (Loading products)</p>
     </div>
-
   </main>
 
-  <!-- Footer -->
-  <footer>
-    <p>&copy; <span id="year"></span> ፕራይም ሞባይል (Prime Mobile). መብቱ በህግ የተጠበቀ ነው።</p>
-  </footer>
-
-  <!-- Lightbox Overlay -->
-  <div id="lightbox" class="lightbox">
-    <div class="lightbox-controls">
-      <button class="icon-btn close-btn" onclick="closeLightbox()">
-        <i data-lucide="x"></i>
-      </button>
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-header">
+      <span id="lightboxTitle">Product Name</span>
+      <button class="lightbox-close" id="closeLightbox">&times;</button>
     </div>
-    
-    <button class="nav-btn prev" onclick="prevImage(event)">
-      <i data-lucide="chevron-left"></i>
-    </button>
-    <button class="nav-btn next" onclick="nextImage(event)">
-      <i data-lucide="chevron-right"></i>
-    </button>
-
     <div class="lightbox-content">
-      <div class="lightbox-img-container">
-        <img id="lbImage" src="" alt="Product Image">
-      </div>
-      <div class="lightbox-info">
-        <h3 id="lbTitle" class="lightbox-title"></h3>
-        <p id="lbDesc" class="lightbox-desc"></p>
-        <div id="lbPrice" class="lightbox-price"></div>
+      <img src="" alt="Zoomed Product" class="lightbox-img" id="lightboxImg">
+      <div class="lightbox-controls">
+        <button class="lightbox-btn" id="prevImage">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <button class="lightbox-btn" id="nextImage">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
       </div>
     </div>
+    <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
   </div>
 
   <script>
-    // Initialize Icons
-    lucide.createIcons();
-    document.getElementById('year').textContent = new Date().getFullYear();
-
-    // State Variables
+    // App State
     let allProducts = [];
     let currentCategory = 'All';
     let currentSearch = '';
     
-    // Lightbox State
-    let lbImages = [];
-    let lbCurrentIndex = 0;
+    let shopIsOpen = true;
+    let shopPhone = '+251911234567';
+    let shopTelegram = 't.me/PrimeMobileStore';
 
-    const productListEl = document.getElementById('productList');
-    const searchInput = document.getElementById('searchInput');
-    const categoryChips = document.querySelectorAll('.chip');
-
-    // Number formatter for Ethiopian Birr
-    const formatPrice = (price) => {
-      return new Intl.NumberFormat('en-ET').format(price);
-    };
-
-    // Render skeleton loaders
-    function renderSkeletons() {
-      productListEl.innerHTML = Array(8).fill('').map(() => `
-        <div class="card skeleton-card skeleton"></div>
-      `).join('');
-    }
+    let currentLightboxImages = [];
+    let currentLightboxIndex = 0;
 
     // Initialize App
     async function init() {
-      renderSkeletons();
-      await checkSettings();
+      await loadSettings();
       await fetchProducts();
+      setupEventListeners();
     }
 
-    // Check store status
-    async function checkSettings() {
+    // --- PRESERVED LOGIC: Load Settings (Open/Close, Links) ---
+    async function loadSettings() {
       try {
         const res = await fetch('/api/settings');
-        if (res.ok) {
-          const settings = await res.json();
-          if (settings.isOpen === false) {
-            document.getElementById('statusBanner').classList.add('show');
-          }
-        }
+        if (!res.ok) throw new Error('Settings not loaded');
+        const settings = await res.json();
+        
+        shopIsOpen = settings.isOpen !== false;
+        if(settings.phone) shopPhone = settings.phone;
+        if(settings.telegram) shopTelegram = settings.telegram;
+
+        updateStoreStatus();
       } catch (err) {
-        console.error('Settings fetch error:', err);
+        console.warn('Could not load settings from server. Using defaults.', err);
+        updateStoreStatus();
       }
     }
 
-    // Fetch Products
+    function updateStoreStatus() {
+      const badge = document.getElementById('statusBadge');
+      const icon = document.getElementById('statusIcon');
+      const text = document.getElementById('statusText');
+      const phoneLink = document.getElementById('phoneLink');
+      const teleLink = document.getElementById('telegramLink');
+
+      if (shopIsOpen) {
+        badge.className = 'status-badge status-open';
+        icon.innerText = '🟢';
+        text.innerText = 'ክፍት ነው (Open)';
+      } else {
+        badge.className = 'status-badge status-closed';
+        icon.innerText = '🔴';
+        text.innerText = 'ዝግ ነው (Closed)';
+      }
+
+      phoneLink.href = `tel:${shopPhone.replace(/\s/g, '')}`;
+      
+      let cleanTele = shopTelegram;
+      if (cleanTele.includes('t.me/')) cleanTele = 'https://' + cleanTele;
+      else if (!cleanTele.startsWith('http')) cleanTele = 'https://t.me/' + cleanTele.replace('@', '');
+      teleLink.href = cleanTele;
+    }
+
+    // --- Fetch Products ---
     async function fetchProducts() {
+      const grid = document.getElementById('productGrid');
       try {
         const res = await fetch('/api/products');
-        if (!res.ok) throw new Error('Failed to load products');
+        if (!res.ok) throw new Error('Network response was not ok');
         allProducts = await res.json();
-        
-        // Sort newest first
-        allProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        
         filterAndRender();
-      } catch (err) {
-        console.error(err);
-        productListEl.innerHTML = `
-          <div class="empty-state">
-            <i data-lucide="alert-circle"></i>
-            <h3>ምርቶችን መጫን አልተቻለም (Failed to load)</h3>
-            <p>እባክዎ ገፁን እንደገና ያድሱ (Please refresh the page)</p>
+      } catch (error) {
+        console.error('Fetch error:', error);
+        grid.innerHTML = `
+          <div class="loader">
+            <p style="color: #ef4444;">❌ ይቅርታ፣ ምርቶችን መጫን አልተቻለም። (Failed to load products)</p>
+            <button onclick="fetchProducts()" style="margin-top:10px; padding:8px 16px; border-radius:8px; border:none; background:var(--primary); color:white;">እንደገና ሞክር (Retry)</button>
           </div>
         `;
-        lucide.createIcons();
       }
     }
 
-    // Filter and Render
-    function filterAndRender() {
-      const query = currentSearch.toLowerCase();
-      const filtered = allProducts.filter(p => {
-        const matchesCategory = currentCategory === 'All' || p.category === currentCategory;
-        const matchesSearch = p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query);
-        return matchesCategory && matchesSearch;
-      });
-
-      if (filtered.length === 0) {
-        productListEl.innerHTML = `
-          <div class="empty-state">
-            <i data-lucide="search-x"></i>
-            <h3>ምንም ምርት አልተገኘም</h3>
-            <p>በዚህ ፍለጋ የተገኘ ውጤት የለም።</p>
-          </div>
-        `;
-        lucide.createIcons();
-        return;
-      }
-
-      productListEl.innerHTML = filtered.map(product => {
-        // Fallback image logic
-        let displayImg = '';
-        if (product.images && product.images.length > 0) {
-          displayImg = `<img src="${product.images[0]}" alt="${escapeHtml(product.name)}" loading="lazy">`;
-        } else if (product.imageUrl) {
-          displayImg = `<img src="${product.imageUrl}" alt="${escapeHtml(product.name)}" loading="lazy">`;
-        } else {
-          displayImg = `<i data-lucide="image" class="fallback-icon" style="width: 64px; height: 64px;"></i>`;
-        }
-
-        return `
-          <div class="card" onclick='openLightbox(${JSON.stringify(product).replace(/'/g, "&#39;")})'>
-            <div class="card-img-wrapper">
-              ${displayImg}
-            </div>
-            <div class="card-content">
-              <span class="card-category">${product.category || 'Product'}</span>
-              <h3 class="card-title">${escapeHtml(product.name)}</h3>
-              <p class="card-desc">${escapeHtml(product.description)}</p>
-              <div class="card-footer">
-                <div class="card-price">${formatPrice(product.price)} <span>ETB</span></div>
-                <div class="btn-view">
-                  <i data-lucide="arrow-up-right" style="width: 20px; height: 20px;"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-      
-      lucide.createIcons();
-    }
-
-    // Helper: Escape HTML to prevent XSS
     function escapeHtml(str) {
       if (!str) return '';
       return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
-    // Event Listeners for Search & Categories
-    searchInput.addEventListener('input', (e) => {
-      currentSearch = e.target.value;
-      filterAndRender();
-    });
+    function filterAndRender() {
+      let filtered = allProducts;
 
-    categoryChips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        // Update active class
-        categoryChips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
+      // Category filter
+      if (currentCategory !== 'All') {
+        filtered = filtered.filter(p => p.category === currentCategory);
+      }
+
+      // Search filter
+      if (currentSearch.trim() !== '') {
+        const term = currentSearch.toLowerCase();
+        filtered = filtered.filter(p => 
+          (p.name && p.name.toLowerCase().includes(term)) || 
+          (p.description && p.description.toLowerCase().includes(term))
+        );
+      }
+
+      renderProducts(filtered);
+    }
+
+    function renderProducts(products) {
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = '';
+
+      if (products.length === 0) {
+        grid.innerHTML = `<div class="loader"><p>ምንም ምርት አልተገኘም። (No products found)</p></div>`;
+        return;
+      }
+
+      // Format telegram base URL for the order button
+      let teleBase = shopTelegram;
+      if (!teleBase.includes('t.me/')) {
+        teleBase = teleBase.replace('@', '');
+      } else {
+        teleBase = teleBase.split('t.me/')[1];
+      }
+
+      products.forEach(product => {
+        const images = product.images && product.images.length > 0 ? product.images : [product.imageUrl || 'https://via.placeholder.com/300?text=No+Image'];
+        const mainImage = images[0];
+        const safeName = escapeHtml(product.name);
+        const safeDesc = escapeHtml(product.description);
+        const priceStr = product.price ? Number(product.price).toLocaleString() + ' ETB' : 'ዋጋ አልወጣም';
         
-        // Update filter
-        currentCategory = chip.dataset.category;
-        filterAndRender();
+        // Custom order message
+        const orderMessage = encodeURIComponent(`ጤና ይስጥልኝ፣ ይህን ዕቃ መግዛት እፈልጋለሁ: ${product.name}`);
+        const orderLink = `https://t.me/${teleBase}?text=${orderMessage}`;
+
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <div class="product-image-wrapper" onclick="openLightbox('${product._id}')">
+            <img src="${escapeHtml(mainImage)}" alt="${safeName}" loading="lazy">
+            ${images.length > 1 ? `<div class="image-badge">1 / ${images.length}</div>` : ''}
+          </div>
+          <div class="product-info">
+            <div class="product-category">${escapeHtml(product.category || 'Phone')}</div>
+            <h3 class="product-title">${safeName}</h3>
+            <p class="product-desc">${safeDesc}</p>
+            <div class="product-bottom">
+              <div class="product-price">${priceStr}</div>
+              <a href="${orderLink}" target="_blank" class="order-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9.78,18.65L10.06,14.42L17.74,7.5C18.08,7.19 17.67,7.04 17.22,7.31L7.74,13.3L3.64,12C2.76,11.75 2.75,11.14 3.84,10.7L19.81,4.54C20.54,4.21 21.24,4.72 20.96,5.84L18.24,18.65C18.05,19.56 17.5,19.78 16.74,19.36L12.6,16.3L10.61,18.23C10.38,18.46 10.19,18.65 9.78,18.65Z"/></svg>
+                እዘዝ (Order)
+              </a>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
       });
-    });
+    }
 
-    // Lightbox Logic
-    const lightboxEl = document.getElementById('lightbox');
-    const lbImageEl = document.getElementById('lbImage');
-    const lbTitleEl = document.getElementById('lbTitle');
-    const lbDescEl = document.getElementById('lbDesc');
-    const lbPriceEl = document.getElementById('lbPrice');
+    // --- Lightbox Logic ---
+    function openLightbox(productId) {
+      const product = allProducts.find(p => p._id === productId);
+      if (!product) return;
 
-    function openLightbox(product) {
-      lbImages = product.images && product.images.length > 0 ? product.images : (product.imageUrl ? [product.imageUrl] : []);
-      lbCurrentIndex = 0;
+      currentLightboxImages = product.images && product.images.length > 0 ? product.images : [product.imageUrl || 'https://via.placeholder.com/600?text=No+Image'];
+      currentLightboxIndex = 0;
       
-      lbTitleEl.textContent = product.name;
-      lbDescEl.textContent = product.description;
-      lbPriceEl.innerHTML = `${formatPrice(product.price)} <span style="font-size:1rem; color:var(--text-muted)">ETB</span>`;
-
+      document.getElementById('lightboxTitle').innerText = product.name;
       updateLightboxImage();
-      lightboxEl.classList.add('active');
+      
+      const lightbox = document.getElementById('lightbox');
+      lightbox.classList.add('active');
       document.body.style.overflow = 'hidden'; // Prevent background scrolling
     }
 
-    function updateLightboxImage() {
-      if (lbImages.length === 0) {
-        lbImageEl.style.display = 'none';
-        return;
-      }
-      lbImageEl.style.display = 'block';
-      lbImageEl.src = lbImages[lbCurrentIndex];
-      
-      // Manage Nav Buttons Visibility
-      const prevBtn = document.querySelector('.nav-btn.prev');
-      const nextBtn = document.querySelector('.nav-btn.next');
-      
-      if (lbImages.length <= 1) {
-        prevBtn.style.display = 'none';
-        nextBtn.style.display = 'none';
-      } else {
-        prevBtn.style.display = 'flex';
-        nextBtn.style.display = 'flex';
-      }
-    }
-
     function closeLightbox() {
-      lightboxEl.classList.remove('active');
+      document.getElementById('lightbox').classList.remove('active');
       document.body.style.overflow = '';
-      setTimeout(() => {
-        lbImageEl.src = '';
-      }, 300);
     }
 
-    function prevImage(e) {
-      if (e) e.stopPropagation();
-      if (lbImages.length <= 1) return;
-      lbCurrentIndex = (lbCurrentIndex - 1 + lbImages.length) % lbImages.length;
+    function updateLightboxImage() {
+      const imgEl = document.getElementById('lightboxImg');
+      imgEl.src = currentLightboxImages[currentLightboxIndex];
+      
+      const counter = document.getElementById('lightboxCounter');
+      counter.innerText = `${currentLightboxIndex + 1} / ${currentLightboxImages.length}`;
+
+      // Hide/show controls if only 1 image
+      const btns = document.querySelectorAll('.lightbox-btn');
+      btns.forEach(btn => btn.style.display = currentLightboxImages.length > 1 ? 'flex' : 'none');
+    }
+
+    function prevImage() {
+      if (currentLightboxImages.length <= 1) return;
+      currentLightboxIndex = (currentLightboxIndex - 1 + currentLightboxImages.length) % currentLightboxImages.length;
       updateLightboxImage();
     }
 
-    function nextImage(e) {
-      if (e) e.stopPropagation();
-      if (lbImages.length <= 1) return;
-      lbCurrentIndex = (lbCurrentIndex + 1) % lbImages.length;
+    function nextImage() {
+      if (currentLightboxImages.length <= 1) return;
+      currentLightboxIndex = (currentLightboxIndex + 1) % currentLightboxImages.length;
       updateLightboxImage();
     }
 
-    // Close lightbox when clicking outside
-    lightboxEl.addEventListener('click', (e) => {
-      if (e.target === lightboxEl) {
-        closeLightbox();
-      }
-    });
+    // --- Event Listeners ---
+    function setupEventListeners() {
+      // Search Input
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        currentSearch = e.target.value;
+        filterAndRender();
+      });
 
-    // Swipe Support for Lightbox
-    let touchStartX = 0;
-    lightboxEl.addEventListener('touchstart', (e) => {
-      touchStartX = e.changedTouches[0].clientX;
-    }, { passive: true });
+      // Category Tabs
+      const chips = document.querySelectorAll('.category-chip');
+      chips.forEach(chip => {
+        chip.addEventListener('click', (e) => {
+          chips.forEach(c => c.classList.remove('active'));
+          e.target.classList.add('active');
+          currentCategory = e.target.getAttribute('data-cat');
+          filterAndRender();
+        });
+      });
 
-    lightboxEl.addEventListener('touchend', (e) => {
-      const touchEndX = e.changedTouches[0].clientX;
-      const diff = touchEndX - touchStartX;
-      if (Math.abs(diff) > 50) { // Threshold
-        if (diff > 0) prevImage();
-        else nextImage();
-      }
-    }, { passive: true });
+      // Lightbox Controls
+      document.getElementById('closeLightbox').addEventListener('click', closeLightbox);
+      document.getElementById('prevImage').addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
+      document.getElementById('nextImage').addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
+      
+      const lightboxEl = document.getElementById('lightbox');
+      lightboxEl.addEventListener('click', (e) => {
+        if (e.target === lightboxEl || e.target.classList.contains('lightbox-content')) closeLightbox();
+      });
 
-    // Keyboard Support
-    document.addEventListener('keydown', (e) => {
-      if (!lightboxEl.classList.contains('active')) return;
-      if (e.key === 'ArrowLeft') prevImage();
-      if (e.key === 'ArrowRight') nextImage();
-      if (e.key === 'Escape') closeLightbox();
-    });
+      // Swipe support for Lightbox
+      let touchStartX = 0;
+      lightboxEl.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].clientX);
+      lightboxEl.addEventListener('touchend', e => {
+        const diff = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(diff) > 50) diff > 0 ? prevImage() : nextImage();
+      });
+
+      // Keyboard
+      document.addEventListener('keydown', (e) => {
+        if (!lightboxEl.classList.contains('active')) return;
+        if (e.key === 'ArrowLeft') prevImage();
+        if (e.key === 'ArrowRight') nextImage();
+        if (e.key === 'Escape') closeLightbox();
+      });
+    }
 
     // Start
     init();
-
   </script>
 </body>
 </html>
