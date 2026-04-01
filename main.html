@@ -2,774 +2,834 @@
 <html lang="am">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>ፕራይም ሞባይል | Prime Mobile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>ፕራይም ሞባይል | ምርጥ ስልኮች እና መለዋወጫዎች</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
-    :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --accent: #f59e0b;
-      --bg-color: #f8fafc;
-      --surface: #ffffff;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
-      --radius-sm: 12px;
-      --radius-md: 20px;
-      --radius-lg: 28px;
-      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
-    }
-
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
     }
 
     body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      padding-bottom: 80px; /* Space for mobile scrolling */
-      -webkit-font-smoothing: antialiased;
+      background: #f4f7fc;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      padding: 14px;
+      padding-bottom: 48px;
+      min-height: 100vh;
     }
 
-    /* --- PROMO BANNER --- */
-    .promo-banner {
-      background: linear-gradient(90deg, #4f46e5, #ec4899, #f59e0b);
-      background-size: 200% auto;
-      color: white;
-      text-align: center;
-      padding: 10px 16px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      animation: gradientFlow 5s ease infinite;
-    }
-    @keyframes gradientFlow {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    /* smooth scroll */
+    html {
+      scroll-behavior: smooth;
     }
 
-    /* --- HEADER --- */
-    .app-header {
-      background: var(--surface);
-      padding: 16px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .brand-container {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .brand-title {
-      font-size: 1.4rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .brand-title svg {
-      width: 24px;
-      height: 24px;
-      fill: var(--primary);
-    }
-
-    /* Status Badge (Preserved Logic) */
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 20px;
-      width: fit-content;
-      transition: all 0.3s ease;
-    }
-    .status-open {
-      background: #dcfce7;
-      color: #166534;
-    }
-    .status-closed {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-    #statusIcon { font-size: 0.7rem; }
-
-    .header-actions {
-      display: flex;
-      gap: 12px;
-    }
-
-    .icon-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: #f1f5f9;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-main);
-      text-decoration: none;
-      transition: transform 0.2s, background 0.2s;
-    }
-    .icon-btn:active {
-      transform: scale(0.92);
-      background: #e2e8f0;
-    }
-    .icon-btn svg {
-      width: 20px;
-      height: 20px;
-    }
-    .icon-btn.telegram { color: #0088cc; background: #e0f2fe; }
-
-    /* --- STICKY CONTROLS (Search & Categories) --- */
-    .sticky-controls {
-      position: sticky;
-      top: 0;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      z-index: 50;
-      padding: 12px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .search-box {
-      position: relative;
-      width: 100%;
-    }
-    .search-box svg {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      width: 20px;
-      height: 20px;
-    }
-    .search-box input {
-      width: 100%;
-      background: var(--bg-color);
-      border: 1px solid var(--border);
-      padding: 14px 16px 14px 44px;
-      border-radius: var(--radius-sm);
-      font-size: 1rem;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .search-box input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-    }
-
-    .categories {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      -ms-overflow-style: none;  /* IE and Edge */
-      scrollbar-width: none;  /* Firefox */
-    }
-    .categories::-webkit-scrollbar {
-      display: none;
-    }
-    .category-chip {
-      background: var(--bg-color);
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-      padding: 8px 18px;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      white-space: nowrap;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .category-chip.active {
-      background: var(--text-main);
-      color: white;
-      border-color: var(--text-main);
-    }
-
-    /* --- PRODUCT GRID --- */
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 16px;
-      padding: 20px;
-      max-width: 1200px;
+    .container {
+      max-width: 1280px;
       margin: 0 auto;
     }
-    @media (min-width: 768px) {
+
+    /* ========== HERO (refined, compact) ========== */
+    .hero {
+      background: linear-gradient(135deg, #0a2540 0%, #1c4e6f 100%);
+      border-radius: 28px;
+      padding: 20px 18px;
+      margin-bottom: 18px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 20px -12px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero::after {
+      content: "📱⚡";
+      position: absolute;
+      bottom: -8px;
+      right: 8px;
+      font-size: 70px;
+      opacity: 0.08;
+      pointer-events: none;
+    }
+
+    .hero h1 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .hero p {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      line-height: 1.35;
+      max-width: 75%;
+    }
+
+    .open-status {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(8px);
+      padding: 5px 12px;
+      border-radius: 60px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .open-status.open {
+      background: #0F9D58;
+      box-shadow: 0 2px 10px rgba(15,157,88,0.3);
+    }
+
+    .open-status.closed {
+      background: #DC3545;
+    }
+
+    /* ========== PROMO BANNER (little & dismissible) ========== */
+    .promo-banner {
+      background: linear-gradient(105deg, #f9b43a 0%, #fb8c00 100%);
+      border-radius: 60px;
+      padding: 10px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      box-shadow: 0 6px 14px rgba(251, 140, 0, 0.2);
+      backdrop-filter: blur(2px);
+      transition: all 0.2s ease;
+    }
+
+    .promo-text {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #2c1a0c;
+      letter-spacing: -0.2px;
+    }
+
+    .promo-text span:first-child {
+      font-size: 1.3rem;
+    }
+
+    .promo-text strong {
+      background: rgba(0,0,0,0.12);
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-size: 0.75rem;
+    }
+
+    .close-banner {
+      background: rgba(0,0,0,0.2);
+      border: none;
+      color: #2c1a0c;
+      font-size: 1.2rem;
+      font-weight: 800;
+      cursor: pointer;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 60px;
+      transition: all 0.2s;
+      backdrop-filter: blur(2px);
+    }
+
+    .close-banner:active {
+      transform: scale(0.92);
+      background: rgba(0,0,0,0.35);
+    }
+
+    /* ========== FILTER BAR – compact, pro ========== */
+    .filter-bar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-radius: 44px;
+      padding: 12px 18px;
+      margin-bottom: 24px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.03);
+      border: 1px solid rgba(255,255,255,0.8);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 18px;
+      border: 1px solid #e2edf2;
+      border-radius: 60px;
+      font-size: 0.9rem;
+      background: #ffffff;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #1c6e9e;
+      box-shadow: 0 0 0 3px rgba(28,110,158,0.2);
+    }
+
+    .category-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .chip {
+      background: #ffffff;
+      padding: 6px 16px;
+      border-radius: 60px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      color: #1f3b4c;
+      border: 1px solid #dee7ef;
+      touch-action: manipulation;
+    }
+
+    .chip.active {
+      background: linear-gradient(105deg, #1c5a7a, #2c7cb0);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 5px 12px -5px rgba(28,90,122,0.4);
+    }
+
+    .chip:active {
+      transform: scale(0.96);
+    }
+
+    /* ========== PRODUCT GRID – denser, smaller items ========== */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    @media (min-width: 640px) {
       .product-grid {
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        gap: 24px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
       }
     }
 
-    .product-card {
-      background: var(--surface);
-      border-radius: var(--radius-md);
+    @media (min-width: 1024px) {
+      .product-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+    }
+
+    /* Compact product card — smaller, pro styling */
+    .card {
+      background: #ffffff;
+      border-radius: 20px;
       overflow: hidden;
-      box-shadow: var(--shadow-sm);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.4, 1);
+      box-shadow: 0 5px 12px -6px rgba(0, 0, 0, 0.08);
       display: flex;
       flex-direction: column;
-      border: 1px solid rgba(0,0,0,0.03);
+      height: 100%;
+      border: 1px solid rgba(0,0,0,0.02);
     }
-    .product-card:active {
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 24px -12px rgba(0, 0, 0, 0.12);
+    }
+
+    .card:active {
       transform: scale(0.98);
     }
 
-    .product-image-wrapper {
-      position: relative;
-      padding-top: 100%; /* 1:1 Aspect Ratio */
-      background: #f1f5f9;
+    .card-img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      background: #f0f4fa;
       cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .card-content {
+      padding: 12px 12px 14px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .category-badge {
+      display: inline-flex;
+      align-items: center;
+      background: #ecf5fb;
+      padding: 3px 10px;
+      border-radius: 40px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #1c5a7a;
+      letter-spacing: 0.2px;
+      width: fit-content;
+      margin-bottom: 8px;
+    }
+
+    .product-name {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #0c2f42;
+      line-height: 1.3;
+      margin-bottom: 4px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
       overflow: hidden;
     }
-    .product-image-wrapper img {
-      position: absolute;
+
+    .product-price {
+      font-size: 1.2rem;
+      font-weight: 800;
+      background: linear-gradient(115deg, #1a5d7a, #2c7cb0);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      margin: 4px 0 6px;
+      letter-spacing: -0.3px;
+    }
+
+    .product-desc {
+      color: #5f6c7a;
+      font-size: 0.7rem;
+      line-height: 1.35;
+      margin: 4px 0 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Smaller call button, but still tappable */
+    .call-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: linear-gradient(105deg, #0F9D58, #0B7E46);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 48px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-decoration: none;
+      margin-top: 6px;
+      transition: all 0.2s;
+      letter-spacing: 0.2px;
+      box-shadow: 0 3px 8px rgba(15,157,88,0.25);
+      touch-action: manipulation;
+    }
+
+    .call-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* Loader & messages */
+    .loader {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 36px;
+      color: #1c5a7a;
+      font-weight: 600;
+      gap: 12px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 48px;
+      grid-column: 1 / -1;
+    }
+
+    .loader::after {
+      content: "";
+      width: 22px;
+      height: 22px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #2c7cb0;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-msg, .no-results {
+      background: rgba(255,255,240,0.95);
+      backdrop-filter: blur(8px);
+      border-radius: 40px;
+      padding: 20px 16px;
+      text-align: center;
+      font-weight: 500;
+      font-size: 0.85rem;
+      grid-column: 1 / -1;
+    }
+
+    .error-msg {
+      color: #B91C1C;
+      border-left: 3px solid #DC3545;
+    }
+
+    .no-results {
+      color: #B45309;
+      background: #FFF8E7;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #6c7f8f;
+      font-size: 0.7rem;
+      font-weight: 500;
+      padding: 16px 8px;
+      border-top: 1px solid rgba(0,0,0,0.05);
+    }
+
+    /* ========== LIGHTBOX – premium & smooth ========== */
+    .lightbox {
+      display: none;
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      object-fit: contain;
-      padding: 16px;
-      transition: transform 0.3s ease;
-    }
-    .product-card:hover .product-image-wrapper img {
-      transform: scale(1.05);
-    }
-    .image-badge {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(4px);
-      color: white;
-      font-size: 0.7rem;
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-weight: 600;
-      z-index: 2;
-    }
-
-    .product-info {
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      flex-grow: 1;
-    }
-    .product-category {
-      font-size: 0.75rem;
-      color: var(--primary);
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
-    }
-    .product-title {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 6px;
-      line-height: 1.3;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .product-desc {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .product-bottom {
-      margin-top: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .product-price {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: #0f172a;
-    }
-    
-    .order-btn {
-      width: 100%;
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: var(--radius-sm);
-      font-weight: 600;
-      font-size: 0.9rem;
-      display: flex;
-      justify-content: center;
+      background: rgba(0, 0, 0, 0.94);
+      backdrop-filter: blur(24px);
+      z-index: 2000;
       align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-    .order-btn:active {
-      background: var(--primary-dark);
+      justify-content: center;
+      flex-direction: column;
+      touch-action: pan-y pinch-zoom;
     }
 
-    /* --- LIGHTBOX --- */
-    .lightbox {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.95);
-      backdrop-filter: blur(5px);
-      z-index: 1000;
-      display: none;
-      flex-direction: column;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
     .lightbox.active {
       display: flex;
-      opacity: 1;
     }
-    .lightbox-header {
-      display: flex;
-      justify-content: space-between;
-      padding: 20px;
-      color: white;
-      z-index: 10;
-    }
-    .lightbox-close {
-      background: rgba(255,255,255,0.2);
-      border: none;
-      color: white;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-    .lightbox-content {
-      flex-grow: 1;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .lightbox-img {
-      max-width: 100%;
-      max-height: 80vh;
+
+    .lightbox img {
+      max-width: 92%;
+      max-height: 72%;
       object-fit: contain;
-      transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      border-radius: 20px;
+      box-shadow: 0 20px 35px rgba(0,0,0,0.5);
     }
-    .lightbox-controls {
+
+    .lightbox .close {
       position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      transform: translateY(-50%);
-      display: flex;
-      justify-content: space-between;
-      padding: 0 16px;
-      pointer-events: none;
-    }
-    .lightbox-btn {
-      pointer-events: auto;
-      background: rgba(255,255,255,0.2);
-      border: none;
+      top: 20px;
+      right: 20px;
+      font-size: 34px;
+      font-weight: 300;
       color: white;
+      cursor: pointer;
+      background: rgba(0,0,0,0.5);
       width: 44px;
       height: 44px;
-      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(4px);
-      cursor: pointer;
+      border-radius: 60px;
+      backdrop-filter: blur(6px);
     }
-    .lightbox-counter {
-      text-align: center;
-      color: rgba(255,255,255,0.7);
-      padding: 20px;
+
+    .lightbox .prev,
+    .lightbox .next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(20, 20, 30, 0.65);
+      backdrop-filter: blur(8px);
+      color: white;
+      font-size: 26px;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 60px;
+    }
+
+    .lightbox .prev:active,
+    .lightbox .next:active {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-50%) scale(0.95);
+    }
+
+    .lightbox .prev {
+      left: 12px;
+    }
+
+    .lightbox .next {
+      right: 12px;
+    }
+
+    .lightbox .counter {
+      position: absolute;
+      bottom: 24px;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(8px);
+      padding: 5px 16px;
+      border-radius: 60px;
+      color: white;
+      font-size: 0.75rem;
       font-weight: 500;
     }
 
-    /* States */
-    .loader {
-      text-align: center;
-      padding: 40px;
-      color: var(--text-muted);
-      grid-column: 1 / -1;
+    @media (max-width: 520px) {
+      body {
+        padding: 10px;
+      }
+      .hero {
+        padding: 16px 14px;
+        border-radius: 24px;
+      }
+      .hero h1 {
+        font-size: 1.45rem;
+      }
+      .hero p {
+        font-size: 0.75rem;
+        max-width: 70%;
+      }
+      .open-status {
+        top: 12px;
+        right: 12px;
+        font-size: 0.65rem;
+        padding: 4px 10px;
+      }
+      .promo-banner {
+        padding: 8px 14px;
+      }
+      .promo-text {
+        font-size: 0.75rem;
+        gap: 6px;
+      }
+      .product-grid {
+        gap: 12px;
+      }
+      .card-content {
+        padding: 10px 10px 12px;
+      }
+      .product-name {
+        font-size: 0.85rem;
+      }
+      .product-price {
+        font-size: 1.05rem;
+      }
+      .call-btn {
+        padding: 7px 10px;
+        font-size: 0.7rem;
+      }
     }
-    .spinner {
-      border: 3px solid rgba(0,0,0,0.1);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 16px auto;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
-
-  <!-- Promo Banner -->
-  <div class="promo-banner">
-    <span>✨ <strong>ልዩ ቅናሽ (Special Offer):</strong> ምርጥ ስልኮች እና መለዋወጫዎች በቅናሽ ዋጋ!</span>
+<div class="container">
+  <!-- Hero section -->
+  <div class="hero">
+    <h1>📱 ፕራይም ሞባይል</h1>
+    <p>የሞባይል ስልኮች እና መለዋወጫዎች — ምርጥ ጥራት፣ ምርጥ ዋጋ</p>
+    <div id="openStatus" class="open-status">...</div>
   </div>
 
-  <!-- Header -->
-  <header class="app-header">
-    <div class="brand-container">
-      <h1 class="brand-title">
-        <svg viewBox="0 0 24 24"><path d="M17,1H7A2,2 0 0,0 5,3V21A2,2 0 0,0 7,23H17A2,2 0 0,0 19,21V3A2,2 0 0,0 17,1M17,19H7V5H17V19M16,13H13V8H11V13H8L12,17L16,13Z"/></svg>
-        Prime Mobile
-      </h1>
-      <!-- Preserved Open/Close Badge Logic -->
-      <div id="statusBadge" class="status-badge status-open">
-        <span id="statusIcon">🟢</span>
-        <span id="statusText">ክፍት ነው (Open)</span>
-      </div>
+  <!-- 🎯 PROMO BANNER (little promotional banner, dismissible) -->
+  <div id="promoBanner" class="promo-banner">
+    <div class="promo-text">
+      <span>🎉</span>
+      <span>ልዩ ቅናሽ! ከ 3000 ብር በላይ ግዢ ➕ ነጻ ማጓጓዝ</span>
+      <strong>ለጊዜው ብቻ</strong>
     </div>
-    
-    <div class="header-actions">
-      <a href="#" id="phoneLink" class="icon-btn">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62,10.79C8.06,13.62 10.38,15.94 13.21,17.38L15.41,15.18C15.69,14.9 16.08,14.82 16.43,14.93C17.55,15.3 18.75,15.5 20,15.5A1,1 0 0,1 21,16.5V20A1,1 0 0,1 20,21A17,17 0 0,1 3,4A1,1 0 0,1 4,3H7.5A1,1 0 0,1 8.5,4C8.5,5.25 8.7,6.45 9.07,7.57C9.18,7.92 9.1,8.31 8.82,8.59L6.62,10.79Z"/></svg>
-      </a>
-      <a href="#" id="telegramLink" class="icon-btn telegram">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.78,18.65L10.06,14.42L17.74,7.5C18.08,7.19 17.67,7.04 17.22,7.31L7.74,13.3L3.64,12C2.76,11.75 2.75,11.14 3.84,10.7L19.81,4.54C20.54,4.21 21.24,4.72 20.96,5.84L18.24,18.65C18.05,19.56 17.5,19.78 16.74,19.36L12.6,16.3L10.61,18.23C10.38,18.46 10.19,18.65 9.78,18.65Z"/></svg>
-      </a>
-    </div>
-  </header>
+    <button class="close-banner" id="closePromoBtn" aria-label="Close">✕</button>
+  </div>
 
-  <!-- Sticky Controls -->
-  <div class="sticky-controls">
-    <div class="search-box">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/></svg>
-      <input type="text" id="searchInput" placeholder="ምርት ይፈልጉ... (Search products)">
-    </div>
-    <div class="categories" id="categoryTabs">
-      <div class="category-chip active" data-cat="All">ሁሉም (All)</div>
-      <div class="category-chip" data-cat="Phone">ስልኮች (Phones)</div>
-      <div class="category-chip" data-cat="Accessory">መለዋወጫ (Accessories)</div>
-      <div class="category-chip" data-cat="Tablet">ታብሌት (Tablets)</div>
+  <!-- Filter bar (search + categories) -->
+  <div class="filter-bar">
+    <input type="text" id="searchInput" class="search-input" placeholder="🔍 ምርቶችን ፈልግ (ስም፣ መግለጫ)" autocomplete="off">
+    <div class="category-chips" id="categoryFilters">
+      <div class="chip active" data-category="All">ሁሉም</div>
     </div>
   </div>
 
-  <!-- Product Grid -->
-  <main class="product-grid" id="productGrid">
-    <div class="loader">
-      <div class="spinner"></div>
-      <p>ምርቶች በመጫን ላይ ናቸው... (Loading products)</p>
-    </div>
-  </main>
-
-  <!-- Lightbox -->
-  <div class="lightbox" id="lightbox">
-    <div class="lightbox-header">
-      <span id="lightboxTitle">Product Name</span>
-      <button class="lightbox-close" id="closeLightbox">&times;</button>
-    </div>
-    <div class="lightbox-content">
-      <img src="" alt="Zoomed Product" class="lightbox-img" id="lightboxImg">
-      <div class="lightbox-controls">
-        <button class="lightbox-btn" id="prevImage">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-        </button>
-        <button class="lightbox-btn" id="nextImage">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-        </button>
-      </div>
-    </div>
-    <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
+  <!-- Product grid -->
+  <div id="productList" class="product-grid">
+    <div class="loader">ምርቶች በመጫን ላይ</div>
   </div>
+  <footer>© ፕራይም ሞባይል — ለማንኛውም ጥያቄ ይደውሉልን</footer>
+</div>
 
-  <script>
-    // App State
-    let allProducts = [];
-    let currentCategory = 'All';
-    let currentSearch = '';
-    
-    let shopIsOpen = true;
-    let shopPhone = '+251911234567';
-    let shopTelegram = 't.me/PrimeMobileStore';
+<!-- Lightbox overlay -->
+<div id="lightbox" class="lightbox">
+  <span class="close">✕</span>
+  <span class="prev">‹</span>
+  <span class="next">›</span>
+  <img id="lightboxImg" src="" alt="">
+  <div class="counter" id="lightboxCounter"></div>
+</div>
 
-    let currentLightboxImages = [];
-    let currentLightboxIndex = 0;
+<script>
+  let allProducts = [];
+  let shopPhone = '0962577855';
+  let shopName = 'Prime Mobile';
+  let isOpen = true;
+  let currentCategory = 'All';
+  let currentSearch = '';
+  let lightboxImages = [];
+  let lightboxIndex = 0;
 
-    // Initialize App
-    async function init() {
-      await loadSettings();
-      await fetchProducts();
-      setupEventListeners();
+  const categoryTranslation = {
+    'All': 'ሁሉም',
+    'Phone': 'ስልክ',
+    'Accessory': 'መለዋወጫ',
+    'Tablet': 'ታብሌት'
+  };
+
+  // ----- Banner dismiss logic (session only, pro) -----
+  const promoBanner = document.getElementById('promoBanner');
+  const closePromo = document.getElementById('closePromoBtn');
+  if (closePromo) {
+    // Check sessionStorage to keep banner hidden for current session if dismissed
+    if (sessionStorage.getItem('primePromoClosed') === 'true') {
+      if (promoBanner) promoBanner.style.display = 'none';
     }
-
-    // --- PRESERVED LOGIC: Load Settings (Open/Close, Links) ---
-    async function loadSettings() {
-      try {
-        const res = await fetch('/api/settings');
-        if (!res.ok) throw new Error('Settings not loaded');
-        const settings = await res.json();
-        
-        shopIsOpen = settings.isOpen !== false;
-        if(settings.phone) shopPhone = settings.phone;
-        if(settings.telegram) shopTelegram = settings.telegram;
-
-        updateStoreStatus();
-      } catch (err) {
-        console.warn('Could not load settings from server. Using defaults.', err);
-        updateStoreStatus();
+    closePromo.addEventListener('click', () => {
+      if (promoBanner) {
+        promoBanner.style.display = 'none';
+        sessionStorage.setItem('primePromoClosed', 'true');
       }
+    });
+  }
+
+  // ----- fetch settings (open status, phone) -----
+  async function fetchSettings() {
+    try {
+      const res = await fetch('/api/settings');
+      const data = await res.json();
+      shopPhone = data.phone || '0962577855';
+      shopName = data.shopName || 'Prime Mobile';
+      isOpen = data.isOpen !== undefined ? data.isOpen : true;
+      updateOpenStatus();
+    } catch (err) {
+      console.warn('Could not load settings');
     }
+  }
 
-    function updateStoreStatus() {
-      const badge = document.getElementById('statusBadge');
-      const icon = document.getElementById('statusIcon');
-      const text = document.getElementById('statusText');
-      const phoneLink = document.getElementById('phoneLink');
-      const teleLink = document.getElementById('telegramLink');
-
-      if (shopIsOpen) {
-        badge.className = 'status-badge status-open';
-        icon.innerText = '🟢';
-        text.innerText = 'ክፍት ነው (Open)';
-      } else {
-        badge.className = 'status-badge status-closed';
-        icon.innerText = '🔴';
-        text.innerText = 'ዝግ ነው (Closed)';
-      }
-
-      phoneLink.href = `tel:${shopPhone.replace(/\s/g, '')}`;
-      
-      let cleanTele = shopTelegram;
-      if (cleanTele.includes('t.me/')) cleanTele = 'https://' + cleanTele;
-      else if (!cleanTele.startsWith('http')) cleanTele = 'https://t.me/' + cleanTele.replace('@', '');
-      teleLink.href = cleanTele;
+  function updateOpenStatus() {
+    const statusDiv = document.getElementById('openStatus');
+    if (isOpen) {
+      statusDiv.innerText = 'ሱቃችን ክፍት ነው';
+      statusDiv.className = 'open-status open';
+    } else {
+      statusDiv.innerText = 'ሱቃችን ዝግ ነው';
+      statusDiv.className = 'open-status closed';
     }
+  }
 
-    // --- Fetch Products ---
-    async function fetchProducts() {
-      const grid = document.getElementById('productGrid');
-      try {
-        const res = await fetch('/api/products');
-        if (!res.ok) throw new Error('Network response was not ok');
-        allProducts = await res.json();
-        filterAndRender();
-      } catch (error) {
-        console.error('Fetch error:', error);
-        grid.innerHTML = `
-          <div class="loader">
-            <p style="color: #ef4444;">❌ ይቅርታ፣ ምርቶችን መጫን አልተቻለም። (Failed to load products)</p>
-            <button onclick="fetchProducts()" style="margin-top:10px; padding:8px 16px; border-radius:8px; border:none; background:var(--primary); color:white;">እንደገና ሞክር (Retry)</button>
-          </div>
-        `;
-      }
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    function filterAndRender() {
-      let filtered = allProducts;
-
-      // Category filter
-      if (currentCategory !== 'All') {
-        filtered = filtered.filter(p => p.category === currentCategory);
-      }
-
-      // Search filter
-      if (currentSearch.trim() !== '') {
-        const term = currentSearch.toLowerCase();
-        filtered = filtered.filter(p => 
-          (p.name && p.name.toLowerCase().includes(term)) || 
-          (p.description && p.description.toLowerCase().includes(term))
-        );
-      }
-
-      renderProducts(filtered);
-    }
-
-    function renderProducts(products) {
-      const grid = document.getElementById('productGrid');
-      grid.innerHTML = '';
-
-      if (products.length === 0) {
-        grid.innerHTML = `<div class="loader"><p>ምንም ምርት አልተገኘም። (No products found)</p></div>`;
-        return;
-      }
-
-      // Format telegram base URL for the order button
-      let teleBase = shopTelegram;
-      if (!teleBase.includes('t.me/')) {
-        teleBase = teleBase.replace('@', '');
-      } else {
-        teleBase = teleBase.split('t.me/')[1];
-      }
-
-      products.forEach(product => {
-        const images = product.images && product.images.length > 0 ? product.images : [product.imageUrl || 'https://via.placeholder.com/300?text=No+Image'];
-        const mainImage = images[0];
-        const safeName = escapeHtml(product.name);
-        const safeDesc = escapeHtml(product.description);
-        const priceStr = product.price ? Number(product.price).toLocaleString() + ' ETB' : 'ዋጋ አልወጣም';
-        
-        // Custom order message
-        const orderMessage = encodeURIComponent(`ጤና ይስጥልኝ፣ ይህን ዕቃ መግዛት እፈልጋለሁ: ${product.name}`);
-        const orderLink = `https://t.me/${teleBase}?text=${orderMessage}`;
-
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.innerHTML = `
-          <div class="product-image-wrapper" onclick="openLightbox('${product._id}')">
-            <img src="${escapeHtml(mainImage)}" alt="${safeName}" loading="lazy">
-            ${images.length > 1 ? `<div class="image-badge">1 / ${images.length}</div>` : ''}
-          </div>
-          <div class="product-info">
-            <div class="product-category">${escapeHtml(product.category || 'Phone')}</div>
-            <h3 class="product-title">${safeName}</h3>
-            <p class="product-desc">${safeDesc}</p>
-            <div class="product-bottom">
-              <div class="product-price">${priceStr}</div>
-              <a href="${orderLink}" target="_blank" class="order-btn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9.78,18.65L10.06,14.42L17.74,7.5C18.08,7.19 17.67,7.04 17.22,7.31L7.74,13.3L3.64,12C2.76,11.75 2.75,11.14 3.84,10.7L19.81,4.54C20.54,4.21 21.24,4.72 20.96,5.84L18.24,18.65C18.05,19.56 17.5,19.78 16.74,19.36L12.6,16.3L10.61,18.23C10.38,18.46 10.19,18.65 9.78,18.65Z"/></svg>
-                እዘዝ (Order)
-              </a>
-            </div>
-          </div>
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    // --- Lightbox Logic ---
-    function openLightbox(productId) {
-      const product = allProducts.find(p => p._id === productId);
-      if (!product) return;
-
-      currentLightboxImages = product.images && product.images.length > 0 ? product.images : [product.imageUrl || 'https://via.placeholder.com/600?text=No+Image'];
-      currentLightboxIndex = 0;
-      
-      document.getElementById('lightboxTitle').innerText = product.name;
-      updateLightboxImage();
-      
-      const lightbox = document.getElementById('lightbox');
-      lightbox.classList.add('active');
-      document.body.style.overflow = 'hidden'; // Prevent background scrolling
-    }
-
-    function closeLightbox() {
-      document.getElementById('lightbox').classList.remove('active');
-      document.body.style.overflow = '';
-    }
-
-    function updateLightboxImage() {
-      const imgEl = document.getElementById('lightboxImg');
-      imgEl.src = currentLightboxImages[currentLightboxIndex];
-      
-      const counter = document.getElementById('lightboxCounter');
-      counter.innerText = `${currentLightboxIndex + 1} / ${currentLightboxImages.length}`;
-
-      // Hide/show controls if only 1 image
-      const btns = document.querySelectorAll('.lightbox-btn');
-      btns.forEach(btn => btn.style.display = currentLightboxImages.length > 1 ? 'flex' : 'none');
-    }
-
-    function prevImage() {
-      if (currentLightboxImages.length <= 1) return;
-      currentLightboxIndex = (currentLightboxIndex - 1 + currentLightboxImages.length) % currentLightboxImages.length;
-      updateLightboxImage();
-    }
-
-    function nextImage() {
-      if (currentLightboxImages.length <= 1) return;
-      currentLightboxIndex = (currentLightboxIndex + 1) % currentLightboxImages.length;
-      updateLightboxImage();
-    }
-
-    // --- Event Listeners ---
-    function setupEventListeners() {
-      // Search Input
-      document.getElementById('searchInput').addEventListener('input', (e) => {
-        currentSearch = e.target.value;
-        filterAndRender();
-      });
-
-      // Category Tabs
-      const chips = document.querySelectorAll('.category-chip');
-      chips.forEach(chip => {
-        chip.addEventListener('click', (e) => {
-          chips.forEach(c => c.classList.remove('active'));
-          e.target.classList.add('active');
-          currentCategory = e.target.getAttribute('data-cat');
+  // ----- fetch categories from server (distinct) -----
+  async function fetchCategories() {
+    try {
+      const res = await fetch('/api/categories');
+      const categories = await res.json();
+      const container = document.getElementById('categoryFilters');
+      container.innerHTML = categories.map(cat => `
+        <div class="chip ${cat === 'All' ? 'active' : ''}" data-category="${cat}">${categoryTranslation[cat] || cat}</div>
+      `).join('');
+      document.querySelectorAll('.chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          currentCategory = chip.dataset.category;
           filterAndRender();
         });
       });
-
-      // Lightbox Controls
-      document.getElementById('closeLightbox').addEventListener('click', closeLightbox);
-      document.getElementById('prevImage').addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
-      document.getElementById('nextImage').addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
-      
-      const lightboxEl = document.getElementById('lightbox');
-      lightboxEl.addEventListener('click', (e) => {
-        if (e.target === lightboxEl || e.target.classList.contains('lightbox-content')) closeLightbox();
-      });
-
-      // Swipe support for Lightbox
-      let touchStartX = 0;
-      lightboxEl.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].clientX);
-      lightboxEl.addEventListener('touchend', e => {
-        const diff = e.changedTouches[0].clientX - touchStartX;
-        if (Math.abs(diff) > 50) diff > 0 ? prevImage() : nextImage();
-      });
-
-      // Keyboard
-      document.addEventListener('keydown', (e) => {
-        if (!lightboxEl.classList.contains('active')) return;
-        if (e.key === 'ArrowLeft') prevImage();
-        if (e.key === 'ArrowRight') nextImage();
-        if (e.key === 'Escape') closeLightbox();
-      });
+    } catch (err) {
+      console.error('Failed to load categories', err);
     }
+  }
 
-    // Start
-    init();
-  </script>
+  // ----- load products from API -----
+  async function loadProducts() {
+    const container = document.getElementById('productList');
+    try {
+      const res = await fetch('/api/products');
+      if (!res.ok) throw new Error('Failed to fetch');
+      allProducts = await res.json();
+      filterAndRender();
+    } catch (err) {
+      container.innerHTML = '<div class="error-msg">⚠️ ምርቶችን መጫን አልተቻለም። ኔትዎርክ ይፈትሹ።</div>';
+      console.error(err);
+    }
+  }
+
+  // ----- render with filters (smaller cards already styled) -----
+  function filterAndRender() {
+    const container = document.getElementById('productList');
+    let filtered = [...allProducts];
+    if (currentCategory !== 'All') {
+      filtered = filtered.filter(p => p.category === currentCategory);
+    }
+    if (currentSearch.trim()) {
+      const term = currentSearch.toLowerCase();
+      filtered = filtered.filter(p => 
+        p.name.toLowerCase().includes(term) || 
+        p.description.toLowerCase().includes(term)
+      );
+    }
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="no-results">✨ ምንም ምርት አልተገኘም። ሌላ ነገር ይሞክሩ ወይም ያግኙን!</div>';
+      return;
+    }
+    container.innerHTML = filtered.map(product => {
+      const images = product.images && product.images.length ? product.images : (product.imageUrl ? [product.imageUrl] : []);
+      const firstImage = images[0] || 'https://placehold.co/400x400?text=Prime+Mobile';
+      const categoryDisplay = categoryTranslation[product.category] || product.category;
+      return `
+        <div class="card">
+          <img class="card-img" src="${escapeHtml(firstImage)}" alt="${escapeHtml(product.name)}" data-images='${JSON.stringify(images)}' data-name="${escapeHtml(product.name)}" loading="lazy">
+          <div class="card-content">
+            <span class="category-badge">${escapeHtml(categoryDisplay)}</span>
+            <div class="product-name">${escapeHtml(product.name)}</div>
+            <div class="product-price">${product.price.toLocaleString()} ብር</div>
+            <div class="product-desc">${escapeHtml(product.description)}</div>
+            <a href="tel:${shopPhone}" class="call-btn">
+              📞 ይደውሉልን
+            </a>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Attach lightbox event to every product image
+    document.querySelectorAll('.card-img').forEach(img => {
+      img.addEventListener('click', (e) => {
+        e.stopPropagation();
+        let images = [];
+        try {
+          images = JSON.parse(img.dataset.images);
+        } catch(e) { images = [img.src]; }
+        if (!images || !images.length) images = [img.src];
+        const name = img.dataset.name || 'ምርት';
+        openLightbox(images, 0, name);
+      });
+    });
+  }
+
+  // ----- Lightbox controls (premium feel) -----
+  function openLightbox(images, index, productName) {
+    if (!images.length) return;
+    lightboxImages = images;
+    lightboxIndex = index;
+    const lightbox = document.getElementById('lightbox');
+    const imgEl = document.getElementById('lightboxImg');
+    const counter = document.getElementById('lightboxCounter');
+    imgEl.src = images[index];
+    counter.innerText = `${index+1} / ${images.length}  •  ${productName}`;
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function nextImage() {
+    if (lightboxIndex + 1 < lightboxImages.length) {
+      lightboxIndex++;
+      document.getElementById('lightboxImg').src = lightboxImages[lightboxIndex];
+      document.getElementById('lightboxCounter').innerText = `${lightboxIndex+1} / ${lightboxImages.length}`;
+    }
+  }
+
+  function prevImage() {
+    if (lightboxIndex - 1 >= 0) {
+      lightboxIndex--;
+      document.getElementById('lightboxImg').src = lightboxImages[lightboxIndex];
+      document.getElementById('lightboxCounter').innerText = `${lightboxIndex+1} / ${lightboxImages.length}`;
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  // ---- Search input listener ----
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    currentSearch = e.target.value;
+    filterAndRender();
+  });
+
+  // ---- Lightbox event binding ----
+  const lightboxEl = document.getElementById('lightbox');
+  lightboxEl.addEventListener('click', (e) => {
+    if (e.target === lightboxEl || e.target.classList.contains('close')) closeLightbox();
+  });
+  document.querySelector('.prev').addEventListener('click', (e) => {
+    e.stopPropagation();
+    prevImage();
+  });
+  document.querySelector('.next').addEventListener('click', (e) => {
+    e.stopPropagation();
+    nextImage();
+  });
+
+  // Swipe support for mobile
+  let touchStartX = 0;
+  lightboxEl.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].clientX;
+  });
+  lightboxEl.addEventListener('touchend', (e) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchEndX - touchStartX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) prevImage();
+      else nextImage();
+    }
+  });
+
+  // Keyboard support
+  document.addEventListener('keydown', (e) => {
+    if (!lightboxEl.classList.contains('active')) return;
+    if (e.key === 'ArrowLeft') prevImage();
+    if (e.key === 'ArrowRight') nextImage();
+    if (e.key === 'Escape') closeLightbox();
+  });
+
+  // ---- update call links dynamically when phone changes? (no need, but when settings fetch updates) 
+  // We'll refresh the product list if needed, but phone is updated only via settings fetch, product render uses shopPhone var.
+  // Ensure that whenever we re-render, we use latest shopPhone (already global).
+  // Also we could add event to re-render on settings change, but admin panel may update; it's enough to reload on next page load or we can add a periodic check? not necessary.
+  // To be pro, we can re-fetch settings before each render? But product list already uses shopPhone variable which is set on load.
+  // It will survive unless admin changes, then page refresh will fetch new. Acceptable.
+
+  // ---- INITIALIZE ----
+  window.addEventListener('DOMContentLoaded', async () => {
+    await fetchSettings();      // gets shopPhone, open status
+    await fetchCategories();    // load dynamic category chips
+    await loadProducts();       // render products with smaller card style
+  });
+</script>
 </body>
 </html>
