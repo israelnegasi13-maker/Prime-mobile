@@ -29,7 +29,6 @@
       margin: 0 auto;
     }
 
-    /* Hero */
     .hero {
       background: linear-gradient(135deg, #0a2540 0%, #1c4e6f 100%);
       border-radius: 28px;
@@ -91,7 +90,6 @@
       background: #DC3545;
     }
 
-    /* Promo Banner */
     .promo-banner {
       background: linear-gradient(105deg, #f9b43a 0%, #fb8c00 100%);
       border-radius: 60px;
@@ -151,7 +149,6 @@
       background: rgba(0,0,0,0.35);
     }
 
-    /* Filter Bar */
     .filter-bar {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(12px);
@@ -210,7 +207,6 @@
       transform: scale(0.96);
     }
 
-    /* Product Grid */
     .product-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -288,10 +284,10 @@
       color: #0c2f42;
       line-height: 1.3;
       margin-bottom: 4px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
     }
 
     .product-price {
@@ -340,7 +336,23 @@
       transform: scale(0.96);
     }
 
-    /* Loader & messages */
+    .call-btn.disabled-btn, .call-btn[disabled] {
+      background: #94a3b8;
+      box-shadow: none;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .out-of-stock-badge {
+      background: #dc2626;
+      color: white;
+      font-size: 0.65rem;
+      padding: 2px 8px;
+      border-radius: 40px;
+      display: inline-block;
+      margin-left: 4px;
+    }
+
     .loader {
       display: flex;
       justify-content: center;
@@ -399,7 +411,6 @@
       border-top: 1px solid rgba(0,0,0,0.05);
     }
 
-    /* Lightbox */
     .lightbox {
       display: none;
       position: fixed;
@@ -490,7 +501,6 @@
       font-weight: 500;
     }
 
-    /* Toast Notification */
     .toast-notification {
       position: fixed;
       bottom: 20px;
@@ -609,14 +619,12 @@
 </head>
 <body>
 <div class="container">
-  <!-- Hero section -->
   <div class="hero">
     <h1>📱 ፕራይም ሞባይል</h1>
     <p>የሞባይል ስልኮች እና መለዋወጫዎች — ምርጥ ጥራት፣ ምርጥ ዋጋ</p>
     <div id="openStatus" class="open-status">...</div>
   </div>
 
-  <!-- Promo Banner (dynamic from settings) -->
   <div id="promoBanner" class="promo-banner" style="display: none;">
     <div class="promo-text">
       <span>🎉</span>
@@ -626,7 +634,6 @@
     <button class="close-banner" id="closePromoBtn" aria-label="Close">✕</button>
   </div>
 
-  <!-- Filter bar -->
   <div class="filter-bar">
     <input type="text" id="searchInput" class="search-input" placeholder="🔍 ምርቶችን ፈልግ (ስም፣ መግለጫ)" autocomplete="off">
     <div class="category-chips" id="categoryFilters">
@@ -634,14 +641,12 @@
     </div>
   </div>
 
-  <!-- Product grid -->
   <div id="productList" class="product-grid">
     <div class="loader">ምርቶች በመጫን ላይ</div>
   </div>
   <footer>© ፕራይም ሞባይል — ለማንኛውም ጥያቄ ይደውሉልን</footer>
 </div>
 
-<!-- Lightbox overlay -->
 <div id="lightbox" class="lightbox">
   <span class="close">✕</span>
   <span class="prev">‹</span>
@@ -660,8 +665,6 @@
   let lightboxImages = [];
   let lightboxIndex = 0;
   let promoSettings = { enabled: true, text: '', subtext: '' };
-
-  // Toast notification timer
   let toastTimeout = null;
 
   const categoryTranslation = {
@@ -671,7 +674,6 @@
     'Tablet': 'ታብሌት'
   };
 
-  // ---- Banner dismiss logic (session only) ----
   const promoBanner = document.getElementById('promoBanner');
   const closePromo = document.getElementById('closePromoBtn');
   if (closePromo) {
@@ -683,7 +685,6 @@
     });
   }
 
-  // ---- Fetch settings (open status, phone, promo) ----
   async function fetchSettings() {
     try {
       const res = await fetch('/api/settings');
@@ -718,8 +719,6 @@
     const subtextSpan = document.getElementById('promoSubtext');
     if (textSpan) textSpan.innerText = promoSettings.text;
     if (subtextSpan) subtextSpan.innerText = promoSettings.subtext;
-
-    // Show banner only if enabled and not dismissed in this session
     if (promoSettings.enabled && sessionStorage.getItem('primePromoClosed') !== 'true') {
       promoBanner.style.display = 'flex';
     } else {
@@ -727,7 +726,6 @@
     }
   }
 
-  // ---- Fetch categories from server ----
   async function fetchCategories() {
     try {
       const res = await fetch('/api/categories');
@@ -749,7 +747,6 @@
     }
   }
 
-  // ---- Load products from API ----
   async function loadProducts() {
     const container = document.getElementById('productList');
     try {
@@ -757,7 +754,6 @@
       if (!res.ok) throw new Error('Failed to fetch');
       allProducts = await res.json();
       filterAndRender();
-      // Start random notifications after products are loaded
       startRandomNotifications();
     } catch (err) {
       container.innerHTML = '<div class="error-msg">⚠️ ምርቶችን መጫን አልተቻለም። ኔትዎርክ ይፈትሹ።</div>';
@@ -765,7 +761,6 @@
     }
   }
 
-  // ---- Render products with filters ----
   function filterAndRender() {
     const container = document.getElementById('productList');
     let filtered = [...allProducts];
@@ -779,31 +774,41 @@
         p.description.toLowerCase().includes(term)
       );
     }
+    // Sorting: pinned first, then newest first (already sorted from server, but we ensure)
+    filtered.sort((a, b) => {
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+
     if (filtered.length === 0) {
       container.innerHTML = '<div class="no-results">✨ ምንም ምርት አልተገኘም። ሌላ ነገር ይሞክሩ ወይም ያግኙን!</div>';
       return;
     }
+
     container.innerHTML = filtered.map(product => {
       const images = product.images && product.images.length ? product.images : (product.imageUrl ? [product.imageUrl] : []);
       const firstImage = images[0] || 'https://placehold.co/400x400?text=Prime+Mobile';
       const categoryDisplay = categoryTranslation[product.category] || product.category;
+      const pinnedIcon = product.pinned ? '📌 ' : '';
+      const outOfStockBadge = product.outOfStock ? '<span class="out-of-stock-badge">⚠️ ለጊዜው አለቀ</span>' : '';
+      const callButtonText = product.outOfStock ? '⛔ ለጊዜው አለቀ' : '📞 ይደውሉልን';
+      const callButtonDisabled = product.outOfStock ? 'disabled class="call-btn disabled-btn"' : 'class="call-btn"';
+      
       return `
         <div class="card">
           <img class="card-img" src="${escapeHtml(firstImage)}" alt="${escapeHtml(product.name)}" data-images='${JSON.stringify(images)}' data-name="${escapeHtml(product.name)}" loading="lazy">
           <div class="card-content">
             <span class="category-badge">${escapeHtml(categoryDisplay)}</span>
-            <div class="product-name">${escapeHtml(product.name)}</div>
+            <div class="product-name">${pinnedIcon}${escapeHtml(product.name)} ${outOfStockBadge}</div>
             <div class="product-price">${product.price.toLocaleString()} ብር</div>
             <div class="product-desc">${escapeHtml(product.description)}</div>
-            <a href="tel:${shopPhone}" class="call-btn">
-              📞 ይደውሉልን
-            </a>
+            <a href="tel:${shopPhone}" ${callButtonDisabled}>${callButtonText}</a>
           </div>
         </div>
       `;
     }).join('');
 
-    // Attach lightbox event to every product image
     document.querySelectorAll('.card-img').forEach(img => {
       img.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -818,7 +823,6 @@
     });
   }
 
-  // ---- Lightbox with history API for back button ----
   function openLightbox(images, index, productName) {
     if (!images.length) return;
     lightboxImages = images;
@@ -830,7 +834,6 @@
     counter.innerText = `${index+1} / ${images.length}  •  ${productName}`;
     lightbox.classList.add('active');
     document.body.style.overflow = 'hidden';
-    // Push state to enable back button to close lightbox
     history.pushState({ lightboxOpen: true }, '');
   }
 
@@ -839,9 +842,8 @@
     if (!lightbox.classList.contains('active')) return;
     lightbox.classList.remove('active');
     document.body.style.overflow = '';
-    // Remove the state we pushed
     if (history.state && history.state.lightboxOpen) {
-      history.back(); // this triggers popstate, but we need to avoid infinite loop
+      history.back();
     }
   }
 
@@ -871,12 +873,8 @@
     });
   }
 
-  // ---- Random Notification Toast ----
   function showRandomProductNotification() {
-    // Only if products are loaded and we have at least one
     if (!allProducts.length) return;
-
-    // Get currently filtered products (respects search & category)
     let filtered = [...allProducts];
     if (currentCategory !== 'All') {
       filtered = filtered.filter(p => p.category === currentCategory);
@@ -889,11 +887,8 @@
       );
     }
     if (filtered.length === 0) return;
-
     const randomIndex = Math.floor(Math.random() * filtered.length);
     const product = filtered[randomIndex];
-
-    // Create toast element
     const toast = document.createElement('div');
     toast.className = 'toast-notification';
     toast.innerHTML = `
@@ -904,41 +899,33 @@
       <a href="tel:${shopPhone}" class="toast-call">📞 ይደውሉ</a>
       <button class="toast-close" aria-label="Close">✕</button>
     `;
-
-    // Add close functionality
     const closeBtn = toast.querySelector('.toast-close');
     closeBtn.addEventListener('click', () => {
       toast.remove();
       if (toastTimeout) clearTimeout(toastTimeout);
     });
-
     document.body.appendChild(toast);
-
-    // Auto-remove after 6 seconds
     toastTimeout = setTimeout(() => {
       if (toast && toast.parentNode) toast.remove();
     }, 6000);
   }
 
   function startRandomNotifications() {
-    // Start a timer that triggers a notification after random delay (30-90 seconds)
     function scheduleNotification() {
-      const delay = Math.floor(Math.random() * (90000 - 30000 + 1) + 30000); // 30-90 sec
+      const delay = Math.floor(Math.random() * (90000 - 30000 + 1) + 30000);
       setTimeout(() => {
         showRandomProductNotification();
-        scheduleNotification(); // re-schedule after each
+        scheduleNotification();
       }, delay);
     }
     scheduleNotification();
   }
 
-  // ---- Search input listener ----
   document.getElementById('searchInput').addEventListener('input', (e) => {
     currentSearch = e.target.value;
     filterAndRender();
   });
 
-  // ---- Lightbox event binding & back button handling ----
   const lightboxEl = document.getElementById('lightbox');
   lightboxEl.addEventListener('click', (e) => {
     if (e.target === lightboxEl || e.target.classList.contains('close')) closeLightbox();
@@ -952,23 +939,15 @@
     nextImage();
   });
 
-  // Handle browser back button when lightbox is open
   window.addEventListener('popstate', (event) => {
     if (lightboxEl.classList.contains('active')) {
       closeLightbox();
-      // Prevent the back navigation from actually leaving the page
-      // We already called closeLightbox, now we need to prevent the default back behavior
-      // by pushing a new state? Actually we want to stay on the page after closing.
-      // Since we closed it, we can just not navigate away. But the popstate event already
-      // changed the URL; we can push a new state to keep the current URL.
       if (!event.state || !event.state.lightboxOpen) {
-        // After closing, we can push a new state to avoid leaving the page
         history.pushState(null, '');
       }
     }
   });
 
-  // Swipe support for mobile
   let touchStartX = 0;
   lightboxEl.addEventListener('touchstart', (e) => {
     touchStartX = e.changedTouches[0].clientX;
@@ -982,7 +961,6 @@
     }
   });
 
-  // Keyboard support
   document.addEventListener('keydown', (e) => {
     if (!lightboxEl.classList.contains('active')) return;
     if (e.key === 'ArrowLeft') prevImage();
@@ -990,7 +968,6 @@
     if (e.key === 'Escape') closeLightbox();
   });
 
-  // ---- Initialize ----
   window.addEventListener('DOMContentLoaded', async () => {
     await fetchSettings();
     await fetchCategories();
