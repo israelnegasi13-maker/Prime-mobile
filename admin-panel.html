@@ -238,6 +238,18 @@
       font-size: 1.1rem;
       margin-bottom: 10px;
     }
+    .checkbox-group {
+      display: flex;
+      gap: 16px;
+      margin: 8px 0;
+      flex-wrap: wrap;
+    }
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
@@ -306,6 +318,14 @@
         <option value="Accessory">🎧 መለዋወጫ</option>
         <option value="Tablet">📟 ታብሌት</option>
       </select>
+      <div class="checkbox-group">
+        <label>
+          <input type="checkbox" id="pinnedCheckbox"> 📌 ላይ ሰካ (pinned)
+        </label>
+        <label>
+          <input type="checkbox" id="outOfStockCheckbox"> ⚠️ ለጊዜው አለቀ
+        </label>
+      </div>
       <button id="addProductBtn">ምርት ጨምር</button>
       <div id="addMessage"></div>
     </div>
@@ -406,16 +426,20 @@
     }
     container.innerHTML = filtered.map(p => {
       const thumb = (p.images && p.images[0]) ? p.images[0] : (p.imageUrl || 'https://placehold.co/70x70?text=No+Image');
+      const pinnedBadge = p.pinned ? '📌 ' : '';
+      const outOfStockBadge = p.outOfStock ? '<span style="background:#ef4444; color:white; padding:2px 8px; border-radius:40px; font-size:0.7rem; margin-left:6px;">⚠️ ለጊዜው አለቀ</span>' : '';
       return `
         <div class="product-item" data-id="${p._id}">
           <img class="product-img-thumb" src="${escapeHtml(thumb)}" onerror="this.src='https://placehold.co/70x70?text=No+Image'" alt="thumbnail">
           <div class="product-info">
-            <div class="product-name-admin">${escapeHtml(p.name)}</div>
+            <div class="product-name-admin">${pinnedBadge}${escapeHtml(p.name)} ${outOfStockBadge}</div>
             <div>${p.price.toLocaleString()} ብር | ${escapeHtml(p.category)}</div>
             <small>${escapeHtml(p.description.substring(0, 60))}${p.description.length > 60 ? '...' : ''}</small>
           </div>
           <div class="product-actions">
             <button class="secondary" onclick="editProduct('${p._id}')">✏️ አርትዕ</button>
+            <button class="${p.pinned ? 'success' : 'secondary'}" onclick="togglePin('${p._id}', ${!p.pinned})">📌 ${p.pinned ? 'ፒን አውልቅ' : 'ላይ ሰካ'}</button>
+            <button class="${p.outOfStock ? 'danger' : 'secondary'}" onclick="toggleStock('${p._id}', ${!p.outOfStock})">📦 ${p.outOfStock ? 'አገግም' : 'ለጊዜው አለቀ'}</button>
             <button class="danger" onclick="deleteProduct('${p._id}')">🗑️ ሰርዝ</button>
           </div>
         </div>
@@ -456,6 +480,8 @@
     const description = document.getElementById('description').value.trim();
     const price = parseFloat(document.getElementById('price').value);
     const category = document.getElementById('category').value;
+    const pinned = document.getElementById('pinnedCheckbox').checked;
+    const outOfStock = document.getElementById('outOfStockCheckbox').checked;
 
     if (!name || !description || isNaN(price)) {
       document.getElementById('addMessage').innerHTML = '<div class="alert error">ስም፣ መግለጫ እና ዋጋ መሙላት አለባቸው!</div>';
@@ -467,11 +493,13 @@
     }
 
     try {
-      await callApi('/api/products', 'POST', { name, description, price, images: currentImages, category });
+      await callApi('/api/products', 'POST', { name, description, price, images: currentImages, category, pinned, outOfStock });
       document.getElementById('addMessage').innerHTML = '<div class="alert">✅ ምርት ተጨምሯል!</div>';
       document.getElementById('name').value = '';
       document.getElementById('description').value = '';
       document.getElementById('price').value = '';
+      document.getElementById('pinnedCheckbox').checked = false;
+      document.getElementById('outOfStockCheckbox').checked = false;
       currentImages = [];
       renderImagesInput(currentImages);
       loadProducts();
@@ -490,6 +518,34 @@
       alert('መሰረዝ አልተሳካም: ' + err.message);
     }
   }
+
+  window.togglePin = async function(id, newState) {
+    const product = allProducts.find(p => p._id === id);
+    if (!product) return;
+    try {
+      await callApi(`/api/products/${id}`, 'PUT', {
+        ...product,
+        pinned: newState
+      });
+      loadProducts();
+    } catch (err) {
+      alert('ማዘመን አልተሳካም: ' + err.message);
+    }
+  };
+
+  window.toggleStock = async function(id, newState) {
+    const product = allProducts.find(p => p._id === id);
+    if (!product) return;
+    try {
+      await callApi(`/api/products/${id}`, 'PUT', {
+        ...product,
+        outOfStock: newState
+      });
+      loadProducts();
+    } catch (err) {
+      alert('ማዘመን አልተሳካም: ' + err.message);
+    }
+  };
 
   window.editProduct = async function(id) {
     const product = allProducts.find(p => p._id === id);
@@ -511,6 +567,9 @@
       }
     }
     const newCat = prompt('ምድብ አርትዕ (Phone/Accessory/Tablet):', product.category);
+    const newPinned = confirm(`ምርቱ ላይ ይሰካል? (አሁን: ${product.pinned ? 'አዎ' : 'አይ'})`);
+    const newOutOfStock = confirm(`ለጊዜው አልቋል? (አሁን: ${product.outOfStock ? 'አዎ' : 'አይ'})`);
+    
     if (!newName || !newDesc || isNaN(newPrice)) {
       alert('ልክ ያልሆነ ግቤት። ማርትዕ ተሰርዟል።');
       return;
@@ -521,7 +580,9 @@
         description: newDesc,
         price: newPrice,
         images: newImages,
-        category: newCat
+        category: newCat,
+        pinned: newPinned,
+        outOfStock: newOutOfStock
       });
       loadProducts();
     } catch (err) {
