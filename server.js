@@ -19,7 +19,7 @@ mongoose.connect(MONGODB_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// Product Schema
+// Product Schema with pinned and outOfStock
 const productSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   description: { type: String, required: true, trim: true },
@@ -27,6 +27,8 @@ const productSchema = new mongoose.Schema({
   imageUrl: { type: String, trim: true },
   images: { type: [String], default: [] },
   category: { type: String, default: 'Phone', enum: ['Phone', 'Accessory', 'Tablet'] },
+  pinned: { type: Boolean, default: false },
+  outOfStock: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });
 const Product = mongoose.model('Product', productSchema);
@@ -70,12 +72,12 @@ const adminAuth = (req, res, next) => {
 
 // ========== API Routes ==========
 
-// Get all products (public)
+// Get all products (public) - sorted by pinned first, then newest
 app.get('/api/products', async (req, res) => {
   try {
     const { category } = req.query;
     const filter = category && category !== 'All' ? { category } : {};
-    const products = await Product.find(filter).sort({ createdAt: -1 });
+    const products = await Product.find(filter).sort({ pinned: -1, createdAt: -1 });
     res.json(products);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -133,7 +135,7 @@ app.put('/api/settings', adminAuth, async (req, res) => {
 // Product CRUD (admin only)
 app.post('/api/products', adminAuth, async (req, res) => {
   try {
-    const { name, description, price, images, category } = req.body;
+    const { name, description, price, images, category, pinned, outOfStock } = req.body;
     if (!name || !description || !price) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
@@ -142,7 +144,9 @@ app.post('/api/products', adminAuth, async (req, res) => {
       description,
       price,
       images: images || [],
-      category
+      category,
+      pinned: pinned || false,
+      outOfStock: outOfStock || false
     });
     await product.save();
     res.status(201).json(product);
@@ -153,13 +157,13 @@ app.post('/api/products', adminAuth, async (req, res) => {
 
 app.put('/api/products/:id', adminAuth, async (req, res) => {
   try {
-    const { name, description, price, images, category } = req.body;
+    const { name, description, price, images, category, pinned, outOfStock } = req.body;
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ error: 'Invalid product ID' });
     }
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
-      { name, description, price, images, category },
+      { name, description, price, images, category, pinned, outOfStock },
       { new: true, runValidators: true }
     );
     if (!updatedProduct) return res.status(404).json({ error: 'Product not found' });
